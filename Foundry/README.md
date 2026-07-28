@@ -13,22 +13,6 @@ This project provides an integrated solution for connecting Azure AI Foundry age
 - **[AI Foundry Agent][ai-foundry-docs]** - Agent configuration and usage
 - **[MCP Client][mcp-client-docs]** - CLI and web interface usage
 
-## Security
-
-**⚠️ Important**: Review [Security Guidelines][security-docs] before deploying. This project integrates multiple services requiring careful security considerations.
-
-## Code of Conduct
-Help us keep this project open and inclusive. Please read and follow our [Code of Conduct][ms-code-conduct].
-
-This project follows Microsoft's [Open Source Software Policy][ms-oss-policy].
-
-## Warranty
-
-**No Warranty**: This software is provided "as is" without warranty of any kind, express or implied. See the [LICENSE](LICENSE) file for complete terms and conditions.
-
-## Production Use
-This Solution uses the Preview Version of the Azure AI Foundry SDK. Please check the SDK documentation and release cycle before deploying. If required, please update to a supported SDK stable version.
-
 ## References
 
 - **[Azure AI Foundry Agents Samples][ai-foundry-agents-samples]** - Microsoft repository for AI Foundry agent samples and tools
@@ -36,9 +20,6 @@ This Solution uses the Preview Version of the Azure AI Foundry SDK. Please check
 - **[AI Foundry Training][ai-foundry-training]** - Microsoft Training for AI Foundry
 - **[Model Context Protocol][mcp-spec]** - Official MCP specification and documentation
 
-## Trademarks
-
-Microsoft, Azure, Azure AI Foundry, and other Microsoft products and services mentioned herein are trademarks or registered trademarks of Microsoft Corporation. Snowflake and related marks are trademarks of Snowflake Inc. All other trademarks are the property of their respective owners.
 
 <!-- Reference Links -->
 [ai-foundry]: https://learn.microsoft.com/en-us/azure/ai-foundry/
