@@ -4,8 +4,7 @@ dynamic = ["version"]
 description = "AI Foundry Agent with ISV Services"
 requires-python = ">=3.12,<3.13"
 dependencies = [
-    "azure-ai-projects==1.0.0",
-    "azure-ai-agents==1.2.0b6",
+    "azure-ai-projects==2.4.0",
     "azure-identity",
     "python-dotenv",
     "PyYAML",
