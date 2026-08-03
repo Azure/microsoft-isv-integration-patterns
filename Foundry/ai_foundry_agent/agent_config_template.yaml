@@ -5,7 +5,7 @@ snowflake-cortex-mcp: # Agent name
   MCP_Server_URL: "<MCP_SERVER_URL>" # URL of the MCP Server
   Auth_Token: "<AUTH_TOKEN>" # Authentication token for the MCP Server, Uncheck if not required
   Allowed_Tools: [] # List of allowed tools, empty means all tools are allowed
-  Approval_Mode: "never" # Options: always, never, prompt
+  Approval_Mode: "never" # Options: always, never, prompt, on_request. prompt and on_request map to always.
   Logging: true
   Log_Path: "./logs/agent_logs.txt"
   Delete_Agent_After_Run: True # Set to True to delete the agent after each run. It will also delete the associated thread.
@@ -16,7 +16,7 @@ mongodb-atlas-mcp: # Agent name
   MCP_Server_Label: "mongodb_atlas_mcp" # Label to identify the MCP Server
   MCP_Server_URL: "<MCP_SERVER_URL>" # URL of the MCP Server
   Allowed_Tools: [] # List of allowed tools, empty means all tools are allowed
-  Approval_Mode: "never" # Options: always, never, prompt
+  Approval_Mode: "never" # Options: always, never, prompt, on_request. prompt and on_request map to always.
   Logging: true
   Log_Path: "./logs/agent_logs.txt"
   Delete_Agent_After_Run: True # Set to True to delete the agent after each run. It will also delete the associated thread.
