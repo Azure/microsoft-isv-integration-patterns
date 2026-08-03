@@ -1,0 +1,46 @@
+{
+  "name": "microsoft-isv-integration-patterns",
+  "description": "Microsoft Scout plugins for ISV integration patterns.",
+  "owner": {
+    "name": "Azure"
+  },
+  "metadata": {
+    "description": "Microsoft Scout plugins that install directly from ISV-maintained GitHub repositories.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "snowflake-cortex-code",
+      "description": "Use Snowflake Cortex Code for Snowflake operations, SQL, governance, machine learning, streaming, and related workflows.",
+      "source": {
+        "source": "github",
+        "repo": "Snowflake-Labs/snowflake-ai-kit",
+        "path": "plugins/cortex-code",
+        "ref": "main"
+      },
+      "category": "development"
+    },
+    {
+      "name": "databricks",
+      "description": "Databricks skills for the CLI, Apps, Lakebase, Model Serving, Lakeflow, Declarative Automation Bundles, and related workflows.",
+      "source": {
+        "source": "github",
+        "repo": "databricks/databricks-agent-skills",
+        "path": "plugins/databricks/copilot",
+        "ref": "main"
+      },
+      "category": "development"
+    },
+    {
+      "name": "mongodb-atlas",
+      "description": "Official MongoDB skills for Atlas data, schema design, query optimization, Search, Vector Search, stream processing, and related workflows.",
+      "source": {
+        "source": "github",
+        "repo": "mongodb/agent-skills",
+        "path": "plugins/mongodb-atlas",
+        "ref": "main"
+      },
+      "category": "development"
+    }
+  ]
+}
