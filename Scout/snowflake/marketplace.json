@@ -1,0 +1,20 @@
+{
+  "name": "snowflake-scout-plugin",
+  "description": "Snowflake AI Kit plugin for Microsoft Scout.",
+  "owner": {
+    "name": "Snowflake"
+  },
+  "plugins": [
+    {
+      "name": "snowflake-cortex-code",
+      "description": "Use Snowflake Cortex Code for Snowflake operations, SQL, governance, machine learning, streaming, and related workflows.",
+      "source": {
+        "source": "github",
+        "repo": "Snowflake-Labs/snowflake-ai-kit",
+        "path": "plugins/cortex-code",
+        "ref": "main"
+      },
+      "category": "development"
+    }
+  ]
+}
