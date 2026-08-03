@@ -1,0 +1,20 @@
+{
+  "name": "databricks-scout-plugin",
+  "description": "Databricks Agent Skills plugin for Microsoft Scout.",
+  "owner": {
+    "name": "Databricks"
+  },
+  "plugins": [
+    {
+      "name": "databricks",
+      "description": "Databricks skills for the CLI, Apps, Lakebase, Model Serving, Lakeflow, Declarative Automation Bundles, and related workflows.",
+      "source": {
+        "source": "github",
+        "repo": "databricks/databricks-agent-skills",
+        "path": "plugins/databricks/copilot",
+        "ref": "main"
+      },
+      "category": "development"
+    }
+  ]
+}
