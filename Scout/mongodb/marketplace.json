@@ -1,0 +1,20 @@
+{
+  "name": "mongodb-scout-plugin",
+  "description": "MongoDB Atlas Agent Skills plugin for Microsoft Scout.",
+  "owner": {
+    "name": "MongoDB"
+  },
+  "plugins": [
+    {
+      "name": "mongodb-atlas",
+      "description": "Official MongoDB skills for Atlas data, schema design, query optimization, Search, Vector Search, stream processing, and related workflows.",
+      "source": {
+        "source": "github",
+        "repo": "mongodb/agent-skills",
+        "path": "plugins/mongodb-atlas",
+        "ref": "main"
+      },
+      "category": "development"
+    }
+  ]
+}
