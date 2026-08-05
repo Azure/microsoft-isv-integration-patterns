@@ -24,8 +24,8 @@ This project provides an integrated solution for connecting Azure AI Foundry age
 <!-- Reference Links -->
 [ai-foundry]: https://learn.microsoft.com/en-us/azure/ai-foundry/
 [setup-docs]: docs/Setup.md
-[mcp-server-docs]: docs/mcp_server/MCPServer.MD
-[ai-foundry-docs]: docs/AIFoundry.md
+[mcp-server-docs]: docs/mcp_server/MCPServer.md
+[ai-foundry-docs]: docs/AIFoundryAgent.md
 [mcp-client-docs]: docs/MCPClient.md
 [ai-foundry-agents-samples]: https://github.com/Azure-Samples/ai-foundry-agents-samples
 [ai-projects-sdk-github]: https://github.com/Azure/azure-sdk-for-python/tree/main/sdk/ai/azure-ai-projects

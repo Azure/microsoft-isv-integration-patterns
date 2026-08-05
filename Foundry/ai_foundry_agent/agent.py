@@ -29,7 +29,7 @@ delete_agent_after_run = None
 ignore_existing_agent = None
 model_deployment_name = None
 project_endpoint = None
-auth_token = None
+project_connection_id = None
 logging_initialized = False
 
 def _load_config(input_agent_name):
@@ -37,7 +37,7 @@ def _load_config(input_agent_name):
     global config, agent_name, agent_description, mcp_server_url, mcp_server_label, allowed_tools
     global agent_instructions, approval_mode, logging_enabled, log_path
     global delete_agent_after_run, ignore_existing_agent, model_deployment_name, project_endpoint
-    global auth_token, logging_initialized
+    global project_connection_id, logging_initialized
     
     # Get the directory where this script is located
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -83,7 +83,7 @@ def _load_config(input_agent_name):
     log_path = config.get("Log_Path", "logs/agent_logs.txt")
     delete_agent_after_run = config.get("Delete_Agent_After_Run", False)
     ignore_existing_agent = config.get("Ignore_Existing_Agent", False)
-    auth_token = config.get("Auth_Token", "")
+    project_connection_id = config.get("MCP_Project_Connection_ID", "")
     logging_initialized = False  # Reset logging flag for new config
 
 def _log_message(message):
@@ -119,8 +119,8 @@ def _project_init():
     }
     if allowed_tools:
         mcp_tool_options["allowed_tools"] = allowed_tools
-    if auth_token:
-        mcp_tool_options["headers"] = {"Authorization": f"Bearer {auth_token}"}
+    if project_connection_id:
+        mcp_tool_options["project_connection_id"] = project_connection_id
 
     mcp_tool = MCPTool(
         **mcp_tool_options,
@@ -166,7 +166,14 @@ def _agent_init(project_client, mcp_tool):
 
     return agent
 
-def _agent_run(openai_client, agent, user_message, agent_name, thread_id=None):
+def _agent_run(
+    openai_client,
+    agent,
+    user_message,
+    agent_name,
+    thread_id=None,
+    previous_response_id=None,
+):
     """Create a conversation, invoke the agent, and return conversation results."""
     if thread_id:
         conversation = openai_client.conversations.retrieve(thread_id)
@@ -176,13 +183,33 @@ def _agent_run(openai_client, agent, user_message, agent_name, thread_id=None):
         _log_message(f"Created conversation, ID: {conversation.id}")
 
     agent_reference = {"name": agent.name, "type": "agent_reference"}
-    response = openai_client.responses.create(
-        conversation=conversation.id,
-        input=user_message,
-        extra_body={"agent_reference": agent_reference},
-    )
+    response_options = {
+        "input": user_message,
+        "extra_body": {"agent_reference": agent_reference},
+    }
+    if previous_response_id:
+        response_options["previous_response_id"] = previous_response_id
+    else:
+        response_options["conversation"] = conversation.id
+    response = openai_client.responses.create(**response_options)
 
+    oauth_consent_requests = []
     while True:
+        oauth_consent_requests = [
+            {
+                "id": item.id,
+                "consent_link": item.consent_link,
+            }
+            for item in response.output
+            if item.type == "oauth_consent_request"
+        ]
+        if oauth_consent_requests:
+            for request in oauth_consent_requests:
+                _log_message(
+                    f"OAuth consent required ({request['id']}): {request['consent_link']}"
+                )
+            break
+
         approval_requests = [
             item for item in response.output if item.type == "mcp_approval_request" and item.id
         ]
@@ -232,7 +259,8 @@ def _agent_run(openai_client, agent, user_message, agent_name, thread_id=None):
         "agent_id": agent.id,
         "thread_id": conversation.id,
         "message_id": response.id,
-        "response": conversation_results
+        "response": conversation_results,
+        "oauth_consent_requests": oauth_consent_requests,
     }
 
 def _agent_delete(project_client, openai_client, agent, thread_id):
@@ -247,7 +275,12 @@ def _agent_delete(project_client, openai_client, agent, thread_id):
         _log_message(f"Error deleting thread {thread_id} agent {agent.id}: {e}")
         return False
 
-def _run_agent_with_message(agent_name, user_message, thread_id=None):
+def _run_agent_with_message(
+    agent_name,
+    user_message,
+    thread_id=None,
+    previous_response_id=None,
+):
     """Main function to run the complete agent workflow with a custom message"""
     # Load configuration
     _load_config(agent_name)
@@ -261,11 +294,16 @@ def _run_agent_with_message(agent_name, user_message, thread_id=None):
 
         # Run the agent with the user message
         conversation_results = _agent_run(
-            openai_client, agent, user_message, agent_name, thread_id
+            openai_client,
+            agent,
+            user_message,
+            agent_name,
+            thread_id,
+            previous_response_id,
         )
 
         # Delete the agent after run if set to True
-        if delete_agent_after_run:
+        if delete_agent_after_run and not conversation_results["oauth_consent_requests"]:
             _agent_delete(
                 project_client,
                 openai_client,
@@ -275,18 +313,30 @@ def _run_agent_with_message(agent_name, user_message, thread_id=None):
 
         return conversation_results
 
-def invoke_agent(agent_name, user_message, thread_id=None) -> dict:
+def invoke_agent(
+    agent_name,
+    user_message,
+    thread_id=None,
+    previous_response_id=None,
+) -> dict:
     """
     Public method to invoke the agent with the specified agent name and user message.
     
     Args:
         agent_name (str): The name of the agent configuration to use
         user_message (str): The message to send to the agent
+        thread_id (str): Existing conversation ID, if continuing a conversation
+        previous_response_id (str): OAuth consent response ID to continue after authorization
         
     Returns:
         JSON Response
     """
-    results = _run_agent_with_message(agent_name, user_message, thread_id)
+    results = _run_agent_with_message(
+        agent_name,
+        user_message,
+        thread_id,
+        previous_response_id,
+    )
     return results
 
 def _main():

@@ -63,6 +63,7 @@ Secure AI Foundry through managed networks:
 - **Azure RBAC**: Configure [role-based access control][azure-rbac] for AI Foundry resources
 - **Managed Identity**: Use [system-assigned identities][managed-identity] for service authentication
 - **Key Management**: Secure secrets with [Azure Key Vault][key-vault-security]
+- **OAuth identity passthrough**: Store OAuth settings in a Foundry project connection and include `offline_access` when supported so Foundry can refresh user tokens
 
 ## Additional Security Measures
 
@@ -91,6 +92,7 @@ Secure AI Foundry through managed networks:
 3. **Implement** comprehensive logging and monitoring
 4. **Conduct** security assessments before production deployment
 5. **Follow** principle of least privilege for all service accounts
+6. **Never store OAuth client secrets** in `agent_config.yaml` or source control
 
 <!-- Reference Links -->
 [mcp-considerations]: https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/model-context-protocol#considerations-for-using-non-microsoft-services-and-servers

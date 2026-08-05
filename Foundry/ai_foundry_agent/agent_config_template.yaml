@@ -3,7 +3,7 @@ snowflake-cortex-mcp: # Agent name
   Agent_Description: "Agent to interact with Snowflake Cortex via MCP" # Description of the agent
   MCP_Server_Label: "snowflake_cortex_mcp" # Label to identify the MCP Server
   MCP_Server_URL: "<MCP_SERVER_URL>" # URL of the MCP Server
-  Auth_Token: "<AUTH_TOKEN>" # Authentication token for the MCP Server, Uncheck if not required
+  MCP_Project_Connection_ID: "<OAUTH_PROJECT_CONNECTION_NAME>" # Foundry project connection configured for OAuth identity passthrough
   Allowed_Tools: [] # List of allowed tools, empty means all tools are allowed
   Approval_Mode: "never" # Options: always, never, prompt, on_request. prompt and on_request map to always.
   Logging: true

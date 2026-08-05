@@ -58,6 +58,6 @@ After setup completion:
 <!-- Reference Links -->
 [uv-docs]: https://docs.astral.sh/uv/
 [uv-install]: https://docs.astral.sh/uv/getting-started/installation/
-[mcp-server-docs]: ./MCPServer.md
-[ai-foundry-docs]: ./AIFoundry.md
+[mcp-server-docs]: ./mcp_server/MCPServer.md
+[ai-foundry-docs]: ./AIFoundryAgent.md
 [mcp-client-docs]: ./MCPClient.md

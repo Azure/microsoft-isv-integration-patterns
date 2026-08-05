@@ -44,16 +44,29 @@ if "agent_id" not in st.session_state:
 if "thread_id" not in st.session_state:
     st.session_state.thread_id = ""
 
+if "previous_response_id" not in st.session_state:
+    st.session_state.previous_response_id = ""
+
 if "message_count" not in st.session_state:
     st.session_state.message_count = 0
 
 if "chat_started" not in st.session_state:
     st.session_state.chat_started = False
 
-def send_message_to_agent(agent_name: str, user_message: str, thread_id: Optional[str] = None) -> Dict:
+def send_message_to_agent(
+    agent_name: str,
+    user_message: str,
+    thread_id: Optional[str] = None,
+    previous_response_id: Optional[str] = None,
+) -> Dict:
     """Send a message to the AI Foundry agent"""
     try:
-        result = invoke_agent(agent_name, user_message, thread_id=thread_id)
+        result = invoke_agent(
+            agent_name,
+            user_message,
+            thread_id=thread_id,
+            previous_response_id=previous_response_id,
+        )
         return result
     except Exception as e:
         return {
@@ -109,6 +122,7 @@ def main():
                 st.session_state.messages = []
                 st.session_state.agent_id = ""
                 st.session_state.thread_id = ""
+                st.session_state.previous_response_id = ""
                 st.session_state.message_count = 0
                 st.session_state.chat_started = False
                 st.rerun()
@@ -144,6 +158,7 @@ def main():
             st.session_state.messages = []
             st.session_state.agent_id = ""
             st.session_state.thread_id = ""
+            st.session_state.previous_response_id = ""
             st.session_state.message_count = 0
             st.session_state.chat_started = False
             st.rerun()
@@ -187,7 +202,8 @@ def main():
                     result = send_message_to_agent(
                         st.session_state.agent_name,
                         user_input,
-                        thread_id=st.session_state.thread_id if st.session_state.thread_id else None
+                        thread_id=st.session_state.thread_id or None,
+                        previous_response_id=st.session_state.previous_response_id or None,
                     )
                 
                 # Handle response
@@ -200,7 +216,24 @@ def main():
                     st.session_state.agent_id = result.get("agent_id", "")
                     st.session_state.thread_id = result.get("thread_id", "")
                     st.session_state.chat_started = True
-                    
+
+                    consent_requests = result.get("oauth_consent_requests", [])
+                    if consent_requests:
+                        st.session_state.previous_response_id = result.get("message_id", "")
+                    else:
+                        st.session_state.previous_response_id = ""
+
+                    for request in consent_requests:
+                        consent_message = (
+                            "OAuth authorization is required. "
+                            f"[Sign in and grant consent]({request['consent_link']}), "
+                            "then send your message again."
+                        )
+                        st.warning(consent_message)
+                        st.session_state.messages.append(
+                            {"role": "ASSISTANT", "content": consent_message}
+                        )
+
                     # Process response messages
                     for msg in result.get("response", []):
                         role = msg.get("role", "UNKNOWN")

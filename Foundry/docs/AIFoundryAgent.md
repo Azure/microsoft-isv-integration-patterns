@@ -1,6 +1,6 @@
 # AI Foundry Agent
 
-The AI Foundry Agent integrates Microsoft Foundry with ISV services through the [Model Context Protocol (MCP)][mcp-foundry] using `azure-ai-projects` 2.4 and the Responses API.
+The AI Foundry Agent integrates Microsoft Foundry with ISV services through the [Model Context Protocol (MCP)][mcp-foundry] using `azure-ai-projects` 2.4 and the Responses API. Protected MCP servers use a Foundry project connection configured for OAuth identity passthrough.
 
 ![Architecture Diagram](architecture-diagram.png)
 
@@ -50,7 +50,7 @@ Each agent configuration is defined under a unique agent name (e.g., `snowflake-
 - **Agent_Description**: Brief description of the agent's purpose
 - **MCP_Server_Label**: Identifier label for the MCP server connection
 - **MCP_Server_URL**: Endpoint URL of your deployed MCP server
-- **Auth_Token**: Bearer token for MCP server authentication (if required)
+- **MCP_Project_Connection_ID**: Name of the Foundry project connection configured for OAuth identity passthrough
 - **Allowed_Tools**: Array of specific tool names to enable (empty array = all tools allowed)
 - **Approval_Mode**: Tool execution approval level (`always`, `never`, `prompt`, or `on_request`). The latter two map to the SDK's `always` approval mode.
 - **Logging**: Enable/disable logging (`true`/`false`)
@@ -73,6 +73,28 @@ Each agent configuration is defined under a unique agent name (e.g., `snowflake-
 - `azure-ai-projects` 2.4 or later installed
 - [Azure authentication][azure-auth] configured (DefaultAzureCredential)
 - Running MCP server instance
+
+### Configure OAuth
+
+Create a remote-tool project connection in the Foundry portal, or use `azd ai`. Replace the placeholders with the OAuth application and MCP server values:
+
+```bash
+azd ai project set "<your-foundry-project-endpoint>"
+
+azd ai connection create "<oauth-project-connection-name>" \
+  --kind remote-tool \
+  --target "<mcp-server-url>" \
+  --auth-type oauth2 \
+  --authorization-url "<oauth-authorization-url>" \
+  --token-url "<oauth-token-url>" \
+  --client-id "<oauth-client-id>" \
+  --client-secret "<oauth-client-secret>" \
+  --scopes "<scope1> <scope2> offline_access"
+```
+
+Set `MCP_Project_Connection_ID` in `agent_config.yaml` to the connection name. Keep OAuth client secrets in the Foundry project connection; do not put them in YAML or source control. See [MCP server authentication][mcp-auth] for portal setup and supported OAuth options.
+
+The first MCP call for a user can return an OAuth consent request. The CLI and Streamlit clients display the consent link. Open it, grant access, and send the message again. The clients continue from the consent response automatically. Foundry stores and refreshes the user's token for later calls.
 
 ### Running as Standalone for Testing
 
@@ -102,3 +124,4 @@ def _main():
 [ai-foundry-model-deploy]: https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/deploy-models-openai
 [ai-foundry-connection-info]: https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/create-projects#find-your-project-details
 [azure-auth]: https://learn.microsoft.com/en-us/python/api/overview/azure/identity-readme
+[mcp-auth]: https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/mcp-authentication

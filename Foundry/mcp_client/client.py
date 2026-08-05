@@ -29,6 +29,7 @@ class AIFoundryChat:
     def __init__(self, agent_name: str):
         self.agent_name = agent_name
         self.thread_id: Optional[str] = None
+        self.previous_response_id: Optional[str] = None
         self.message_count = 0
         
     def send_message(self, user_message: str) -> dict:
@@ -37,12 +38,22 @@ class AIFoundryChat:
             # For the first message, we don't have a thread_id yet
             # For subsequent messages, we'll pass the existing thread_id to continue the conversation
             
-            result = invoke_agent(self.agent_name, user_message, thread_id=self.thread_id)
+            result = invoke_agent(
+                self.agent_name,
+                user_message,
+                thread_id=self.thread_id,
+                previous_response_id=self.previous_response_id,
+            )
             
             # Store the thread_id from the first response
             if self.thread_id is None:
                 self.thread_id = result.get('thread_id')
                 print(f"🔗 Started new conversation (Thread: {self.thread_id})")
+
+            if result.get("oauth_consent_requests"):
+                self.previous_response_id = result.get("message_id")
+            else:
+                self.previous_response_id = None
             
             self.message_count += 1
             return result
@@ -55,6 +66,11 @@ class AIFoundryChat:
         if "error" in result:
             print(f"❌ Error: {result['error']}")
             return
+
+        for request in result.get("oauth_consent_requests", []):
+            print("\n🔐 OAuth authorization required.")
+            print(f"Open this URL to sign in: {request['consent_link']}")
+            print("After granting consent, send your message again.")
         
         # Display response messages
         for msg in result.get('response', []):
