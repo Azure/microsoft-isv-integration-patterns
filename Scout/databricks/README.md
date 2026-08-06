@@ -38,10 +38,9 @@ Scout's private runtime directory (`~/.scout/copilot`), and installs
 Scout after it completes.
 
 Scout resolves the manifest's remote source and installs
-`plugins/databricks/copilot` from the `main` branch of the Databricks
-repository. The installation is pinned to the exact upstream commit resolved at
-install time. The provider source is downloaded into Scout's plugin cache, not
-this repository.
+`plugins/databricks/copilot` at the reviewed commit pinned in
+`marketplace.json`. The provider source is downloaded into Scout's plugin
+cache, not this repository.
 
 ## Update
 
@@ -51,21 +50,21 @@ Run the same command again:
 .\install.ps1
 ```
 
-The script refreshes the marketplace and updates an existing installation.
-
-Updates are explicit; upstream changes do not alter an installed plugin until
-you select **Update** in Scout.
+The script refreshes the marketplace and updates an existing installation to
+the commit pinned by this repository. Upstream changes require a reviewed SHA
+update here before Scout can install them.
 
 ## Uninstall
 
+From the `Scout` directory:
+
 ```powershell
-$env:COPILOT_HOME = Join-Path $HOME ".scout\copilot"
-$copilot = Get-ChildItem "C:\Program Files\Microsoft Scout\resources\app.asar.unpacked\node_modules\@github" -Recurse -Filter copilot.exe | Select-Object -First 1 -ExpandProperty FullName
-& $copilot plugin uninstall "databricks@microsoft-isv-integration-patterns"
+.\uninstall.ps1 -PluginName databricks
 ```
 
-Restart Scout afterward. Uninstalling does not change the upstream repository or
-your Databricks configuration.
+The script removes only skill junctions owned by this plugin before
+uninstalling it. Restart Scout afterward. Uninstalling does not change the
+upstream repository or your Databricks configuration.
 
 ## Source and support
 

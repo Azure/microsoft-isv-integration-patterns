@@ -35,7 +35,7 @@ under `~/.scout/m-skills` so the upstream skills appear in Scout's Skills UI.
 Restart Scout after it completes.
 
 Scout resolves the manifest's remote source and installs
-`plugins/cortex-code` from the `main` branch of the Snowflake repository. The
+`plugins/cortex-code` at the reviewed commit pinned in `marketplace.json`. The
 provider source is downloaded into Scout's plugin cache, not this repository.
 
 ## Update
@@ -46,21 +46,21 @@ Run the same command again:
 .\install.ps1
 ```
 
-The script refreshes the marketplace and updates an existing installation.
-
-Updates are explicit; upstream changes do not alter an installed plugin until
-you select **Update** in Scout.
+The script refreshes the marketplace and updates an existing installation to
+the commit pinned by this repository. Upstream changes require a reviewed SHA
+update here before Scout can install them.
 
 ## Uninstall
 
+From the `Scout` directory:
+
 ```powershell
-$env:COPILOT_HOME = Join-Path $HOME ".scout\copilot"
-$copilot = Get-ChildItem "C:\Program Files\Microsoft Scout\resources\app.asar.unpacked\node_modules\@github" -Recurse -Filter copilot.exe | Select-Object -First 1 -ExpandProperty FullName
-& $copilot plugin uninstall "snowflake-cortex-code@microsoft-isv-integration-patterns"
+.\uninstall.ps1 -PluginName snowflake-cortex-code
 ```
 
-Restart Scout afterward. Uninstalling does not change the upstream repository or
-your Snowflake configuration.
+The script removes only skill junctions owned by this plugin before
+uninstalling it. Restart Scout afterward. Uninstalling does not change the
+upstream repository or your Snowflake configuration.
 
 ## Source and support
 

@@ -1,14 +1,8 @@
-# Microsoft Scout plugins
+# Microsoft Scout data platform plugins
 
-This directory contains Scout marketplace manifests for third-party agent
-plugins. Each manifest references the provider's public GitHub repository, so
-Scout installs and updates the provider's source directly. No provider plugin
-content is vendored in this repository.
-
-The repository-level catalog is `.github/plugin/marketplace.json`, the
-conventional path Scout discovers when this GitHub repository is registered as
-a marketplace. The provider directories contain focused manifests and
-installation documentation for each integration.
+This directory contains the Microsoft Scout Desktop integration pattern.
+The installers add provider-maintained Snowflake, Databricks, and MongoDB
+plugins to Scout.
 
 | Plugin | Marketplace | Upstream source |
 | --- | --- | --- |
@@ -16,10 +10,26 @@ installation documentation for each integration.
 | Databricks Agent Skills | [Databricks](databricks/README.md) | [databricks/databricks-agent-skills](https://github.com/databricks/databricks-agent-skills) |
 | MongoDB Atlas Agent Skills | [MongoDB](mongodb/README.md) | [mongodb/agent-skills](https://github.com/mongodb/agent-skills) |
 
-Microsoft Scout Desktop does not currently expose plugin marketplace management
-in its UI. Each provider directory includes a PowerShell installer that uses
-Scout's bundled Copilot CLI and private runtime directory. Running the installer
-again refreshes the marketplace and updates the plugin from its upstream source.
+The [Cowork custom MCP app package](../Cowork/README.md) is a separate,
+top-level product surface. It builds a tenant-specific Microsoft 365 app
+package that connects Cowork to remote Snowflake and Databricks MCP servers.
 
-See the [plugin marketplace documentation](https://docs.github.com/copilot/how-tos/copilot-cli/customize-copilot/plugins-marketplace)
-for the marketplace commands used by Scout's bundled runtime.
+The repository-level Scout catalog is
+`.github/plugin/marketplace.json`. It references provider-owned public GitHub
+repositories; provider plugin source is not vendored here.
+
+## Choose a pattern
+
+| Need | Pattern |
+| --- | --- |
+| Expose remote Snowflake or Databricks MCP tools in Cowork | Build the sibling [Cowork package](../Cowork/README.md) |
+| Add provider-authored skills to Scout Desktop | Run the provider's `install.ps1` |
+| Support both experiences | Install both; their configuration and lifecycle remain independent |
+
+Review each provider's license, security guidance, and preview status before
+production deployment.
+
+The Cowork package uses preview manifest extensions from the supplied examples.
+They are not part of the currently documented public Microsoft 365 app schema;
+review the [compatibility research](../Cowork/docs/research.md) before
+deployment.

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.29/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.29",
+  "version": "{{APP_VERSION}}",
+  "id": "{{APP_ID}}",
+  "developer": {
+    "name": "{{DEVELOPER_NAME}}",
+    "websiteUrl": "{{WEBSITE_URL}}",
+    "privacyUrl": "{{PRIVACY_URL}}",
+    "termsOfUseUrl": "{{TERMS_URL}}"
+  },
+  "name": {
+    "short": "{{SHORT_NAME}}",
+    "full": "{{FULL_NAME}}"
+  },
+  "description": {
+    "short": "{{SHORT_DESCRIPTION}}",
+    "full": "{{FULL_DESCRIPTION}}"
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "accentColor": "{{ACCENT_COLOR}}",
+  "agentSkills": [
+    {
+      "folder": "./skills/data-platform-analytics"
+    }
+  ],
+  "agentConnectors": "{{AGENT_CONNECTORS}}",
+  "validDomains": "{{VALID_DOMAINS}}",
+  "defaultInstallScope": "personal"
+}

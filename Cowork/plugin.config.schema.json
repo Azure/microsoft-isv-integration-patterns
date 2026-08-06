@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Azure/microsoft-isv-integration-patterns/Cowork/plugin.config.schema.json",
+  "title": "Cowork Snowflake and Databricks MCP plugin configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "app",
+    "connectors"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "app": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "developerName",
+        "websiteUrl",
+        "privacyUrl",
+        "termsOfUseUrl",
+        "shortName",
+        "fullName",
+        "shortDescription",
+        "fullDescription",
+        "accentColor",
+        "colorIconPath",
+        "outlineIconPath"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "developerName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "websiteUrl": {
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "privacyUrl": {
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "termsOfUseUrl": {
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "shortName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 30
+        },
+        "fullName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "shortDescription": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "fullDescription": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "accentColor": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "colorIconPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outlineIconPath": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "connectors": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "snowflake",
+        "databricks"
+      ],
+      "properties": {
+        "snowflake": {
+          "$ref": "#/$defs/connector"
+        },
+        "databricks": {
+          "$ref": "#/$defs/connector"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "httpsUrl": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://"
+    },
+    "connector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "id",
+        "displayName",
+        "description",
+        "mcpServerUrl"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{0,63}$"
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "mcpServerUrl": {
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "authorization": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "referenceId"
+          ],
+          "properties": {
+            "type": {
+              "const": "OAuthPluginVault"
+            },
+            "referenceId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}

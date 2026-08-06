@@ -1,0 +1,42 @@
+{
+  "$schema": "./plugin.config.schema.json",
+  "app": {
+    "id": "00000000-0000-0000-0000-000000000000",
+    "version": "1.0.0",
+    "developerName": "Contoso",
+    "websiteUrl": "https://contoso.example",
+    "privacyUrl": "https://contoso.example/privacy",
+    "termsOfUseUrl": "https://contoso.example/terms",
+    "shortName": "Data MCP",
+    "fullName": "Snowflake and Databricks MCP for Cowork",
+    "shortDescription": "Use approved Snowflake and Databricks tools from Cowork.",
+    "fullDescription": "Connect Cowork to organization-approved Snowflake and Databricks remote MCP servers.",
+    "accentColor": "#2563EB",
+    "colorIconPath": "./assets/color.png",
+    "outlineIconPath": "./assets/outline.png"
+  },
+  "connectors": {
+    "snowflake": {
+      "enabled": true,
+      "id": "snowflake",
+      "displayName": "Snowflake MCP Server",
+      "description": "Approved Snowflake data and analytics tools.",
+      "mcpServerUrl": "https://snowflake-mcp.contoso.example/mcp",
+      "authorization": {
+        "type": "OAuthPluginVault",
+        "referenceId": "replace-with-snowflake-oauth-vault-reference"
+      }
+    },
+    "databricks": {
+      "enabled": true,
+      "id": "databricks",
+      "displayName": "Databricks MCP Server",
+      "description": "Approved Databricks data and AI tools.",
+      "mcpServerUrl": "https://databricks-mcp.contoso.example/mcp",
+      "authorization": {
+        "type": "OAuthPluginVault",
+        "referenceId": "replace-with-databricks-oauth-vault-reference"
+      }
+    }
+  }
+}

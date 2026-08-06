@@ -5,29 +5,29 @@
     "name": "Azure"
   },
   "metadata": {
-    "description": "Microsoft Scout plugins that install directly from ISV-maintained GitHub repositories.",
+    "description": "Provider-maintained plugins that install into Microsoft Scout.",
     "version": "1.0.0"
   },
   "plugins": [
     {
       "name": "snowflake-cortex-code",
-      "description": "Use Snowflake Cortex Code for Snowflake operations, SQL, governance, machine learning, streaming, and related workflows.",
+      "description": "Use Snowflake Cortex Code for SQL, governance, machine learning, streaming, and related workflows.",
       "source": {
         "source": "github",
         "repo": "Snowflake-Labs/snowflake-ai-kit",
         "path": "plugins/cortex-code",
-        "ref": "main"
+        "sha": "ba58365fed931f6c83337058628b7b81f099b421"
       },
       "category": "development"
     },
     {
       "name": "databricks",
-      "description": "Databricks skills for the CLI, Apps, Lakebase, Model Serving, Lakeflow, Declarative Automation Bundles, and related workflows.",
+      "description": "Use Databricks skills for the CLI, Apps, Lakebase, Model Serving, Lakeflow, bundles, and related workflows.",
       "source": {
         "source": "github",
         "repo": "databricks/databricks-agent-skills",
         "path": "plugins/databricks/copilot",
-        "ref": "main"
+        "sha": "50ccd08dfce2001aebc95c784f0bf89f3f268fdf"
       },
       "category": "development"
     },
