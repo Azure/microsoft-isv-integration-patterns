@@ -8,35 +8,63 @@
     "privacyUrl": "https://contoso.example/privacy",
     "termsOfUseUrl": "https://contoso.example/terms",
     "shortName": "Data MCP",
-    "fullName": "Snowflake and Databricks MCP for Cowork",
-    "shortDescription": "Use approved Snowflake and Databricks tools from Cowork.",
-    "fullDescription": "Connect Cowork to organization-approved Snowflake and Databricks remote MCP servers.",
+    "fullName": "Data Platform MCP for Cowork",
+    "shortDescription": "Use approved data-platform tools from Cowork.",
+    "fullDescription": "Connect Cowork to organization-approved Snowflake, Databricks, and MongoDB remote MCP servers.",
     "accentColor": "#2563EB",
     "colorIconPath": "./assets/color.png",
     "outlineIconPath": "./assets/outline.png"
   },
   "connectors": {
-    "snowflake": {
-      "enabled": true,
-      "id": "snowflake",
-      "displayName": "Snowflake MCP Server",
-      "description": "Approved Snowflake data and analytics tools.",
-      "mcpServerUrl": "https://snowflake-mcp.contoso.example/mcp",
-      "authorization": {
-        "type": "OAuthPluginVault",
-        "referenceId": "replace-with-snowflake-oauth-vault-reference"
+    "snowflake": [
+      {
+        "enabled": true,
+        "id": "snowflake-production",
+        "displayName": "Snowflake Production",
+        "description": "Approved production Snowflake data and analytics tools.",
+        "mcpServerUrl": "https://snowflake-mcp.contoso.example/mcp",
+        "authorization": {
+          "type": "OAuthPluginVault",
+          "referenceId": "replace-with-snowflake-oauth-vault-reference"
+        }
       }
-    },
-    "databricks": {
-      "enabled": true,
-      "id": "databricks",
-      "displayName": "Databricks MCP Server",
-      "description": "Approved Databricks data and AI tools.",
-      "mcpServerUrl": "https://databricks-mcp.contoso.example/mcp",
-      "authorization": {
-        "type": "OAuthPluginVault",
-        "referenceId": "replace-with-databricks-oauth-vault-reference"
+    ],
+    "databricks": [
+      {
+        "enabled": true,
+        "id": "databricks-development",
+        "displayName": "Databricks Development",
+        "description": "Approved development Databricks data and AI tools.",
+        "mcpServerUrl": "https://databricks-dev-mcp.contoso.example/mcp",
+        "authorization": {
+          "type": "OAuthPluginVault",
+          "referenceId": "replace-with-databricks-development-oauth-vault-reference"
+        }
+      },
+      {
+        "enabled": true,
+        "id": "databricks-production",
+        "displayName": "Databricks Production",
+        "description": "Approved production Databricks data and AI tools.",
+        "mcpServerUrl": "https://databricks-prod-mcp.contoso.example/mcp",
+        "authorization": {
+          "type": "OAuthPluginVault",
+          "referenceId": "replace-with-databricks-production-oauth-vault-reference"
+        }
       }
-    }
+    ],
+    "mongodb": [
+      {
+        "enabled": true,
+        "id": "mongodb-atlas-production",
+        "displayName": "MongoDB Atlas Production",
+        "description": "Approved production MongoDB Atlas data tools.",
+        "mcpServerUrl": "https://mongodb-mcp.contoso.example/mcp",
+        "authorization": {
+          "type": "OAuthPluginVault",
+          "referenceId": "replace-with-mongodb-oauth-vault-reference"
+        }
+      }
+    ]
   }
 }

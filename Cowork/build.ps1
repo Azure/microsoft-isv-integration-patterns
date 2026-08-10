@@ -24,31 +24,37 @@ function Read-RequiredValue {
     return $value
 }
 
-function Read-ConnectorConfig {
-    param([string]$Provider, [object]$Defaults)
+function Read-ConnectorConfigs {
+    param([string]$Provider, [object[]]$Defaults)
 
-    $enabledInput = Read-RequiredValue "$Provider connector enabled (yes/no)" $(if ($Defaults.enabled) { "yes" } else { "no" })
-    $enabled = $enabledInput -match "^(?i:y|yes)$"
-    $connector = [ordered]@{
-        enabled = $enabled
-        id = $Defaults.id
-        displayName = $Defaults.displayName
-        description = $Defaults.description
-        mcpServerUrl = $Defaults.mcpServerUrl
-    }
-    if (-not $enabled) {
-        return $connector
+    $defaultCount = @($Defaults).Count
+    $countInput = Read-RequiredValue "Number of $Provider MCP connector entries" $defaultCount
+    $count = 0
+    if (-not [int]::TryParse($countInput, [ref]$count) -or $count -lt 0) {
+        throw "Number of $Provider MCP connector entries must be a non-negative integer."
     }
 
-    $connector.mcpServerUrl = Read-RequiredValue "$Provider remote MCP HTTPS URL" $Defaults.mcpServerUrl
-    $useOAuth = Read-RequiredValue "$Provider uses an OAuth Plugin Vault reference (yes/no)" "yes"
-    if ($useOAuth -match "^(?i:y|yes)$") {
-        $connector.authorization = [ordered]@{
-            type = "OAuthPluginVault"
-            referenceId = Read-RequiredValue "$Provider OAuth Plugin Vault reference ID" $Defaults.authorization.referenceId
+    $connectors = @()
+    for ($index = 0; $index -lt $count; $index++) {
+        $default = if ($index -lt $defaultCount) { $Defaults[$index] } else { $Defaults[0] }
+        $entryName = "$Provider connector $($index + 1)"
+        $connector = [ordered]@{
+            enabled = $true
+            id = Read-RequiredValue "$entryName unique ID" $default.id
+            displayName = Read-RequiredValue "$entryName display name" $default.displayName
+            description = Read-RequiredValue "$entryName description" $default.description
+            mcpServerUrl = Read-RequiredValue "$entryName remote MCP HTTPS URL" $default.mcpServerUrl
         }
+        $useOAuth = Read-RequiredValue "$entryName uses an OAuth Plugin Vault reference (yes/no)" "yes"
+        if ($useOAuth -match "^(?i:y|yes)$") {
+            $connector.authorization = [ordered]@{
+                type = "OAuthPluginVault"
+                referenceId = Read-RequiredValue "$entryName OAuth Plugin Vault reference ID" $default.authorization.referenceId
+            }
+        }
+        $connectors += $connector
     }
-    return $connector
+    return $connectors
 }
 
 function New-InteractiveConfig {
@@ -72,8 +78,9 @@ function New-InteractiveConfig {
             outlineIconPath = Read-RequiredValue "Path to 32x32 outline PNG" $defaults.app.outlineIconPath
         }
         connectors = [ordered]@{
-            snowflake = Read-ConnectorConfig "Snowflake" $defaults.connectors.snowflake
-            databricks = Read-ConnectorConfig "Databricks" $defaults.connectors.databricks
+            snowflake = @(Read-ConnectorConfigs "Snowflake" @($defaults.connectors.snowflake))
+            databricks = @(Read-ConnectorConfigs "Databricks" @($defaults.connectors.databricks))
+            mongodb = @(Read-ConnectorConfigs "MongoDB" @($defaults.connectors.mongodb))
         }
     }
     $config | ConvertTo-Json -Depth 10 | Set-Content -Encoding utf8 $ConfigPath
@@ -150,7 +157,7 @@ $appProperties = @(
 )
 Assert-AllowedProperties "configuration" $config @('$schema', 'app', 'connectors')
 Assert-AllowedProperties "app" $config.app $appProperties
-Assert-AllowedProperties "connectors" $config.connectors @('snowflake', 'databricks')
+Assert-AllowedProperties "connectors" $config.connectors @('snowflake', 'databricks', 'mongodb')
 
 foreach ($property in $appProperties) {
     Assert-String "app.$property" $config.app.$property
@@ -178,60 +185,71 @@ foreach ($urlProperty in @("websiteUrl", "privacyUrl", "termsOfUseUrl")) {
 }
 
 $agentConnectors = @()
-foreach ($provider in @("snowflake", "databricks")) {
-    $connector = $config.connectors.$provider
-    Assert-AllowedProperties "connectors.$provider" $connector @(
-        'enabled',
-        'id',
-        'displayName',
-        'description',
-        'mcpServerUrl',
-        'authorization'
-    )
-    if ($connector.enabled -isnot [bool]) {
-        throw "connectors.$provider.enabled must be a JSON boolean."
+$connectorIds = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+foreach ($provider in @("snowflake", "databricks", "mongodb")) {
+    $providerConnectors = $config.connectors.$provider
+    if ($null -eq $providerConnectors -or $providerConnectors -isnot [array]) {
+        throw "connectors.$provider must be a JSON array."
     }
-    if (-not $connector.enabled) {
-        continue
-    }
-    foreach ($property in @("id", "displayName", "description", "mcpServerUrl")) {
-        Assert-String "connectors.$provider.$property" $connector.$property
-    }
-    if ($connector.id -notmatch "^[a-z][a-z0-9-]{0,63}$") {
-        throw "connectors.$provider.id must start with a lowercase letter and contain only lowercase letters, digits, or hyphens."
-    }
-    Assert-Length "connectors.$provider.displayName" $connector.displayName 64
-    Assert-Length "connectors.$provider.description" $connector.description 200
-    $mcpUri = Assert-HttpsUrl "connectors.$provider.mcpServerUrl" $connector.mcpServerUrl
-    [void]$domains.Add($mcpUri.Host)
+    for ($index = 0; $index -lt $providerConnectors.Count; $index++) {
+        $connector = $providerConnectors[$index]
+        $connectorName = "connectors.$provider[$index]"
+        Assert-AllowedProperties $connectorName $connector @(
+            'enabled',
+            'id',
+            'displayName',
+            'description',
+            'mcpServerUrl',
+            'authorization'
+        )
+        if ($connector.enabled -isnot [bool]) {
+            throw "$connectorName.enabled must be a JSON boolean."
+        }
+        if (-not $connector.enabled) {
+            continue
+        }
+        foreach ($property in @("id", "displayName", "description", "mcpServerUrl")) {
+            Assert-String "$connectorName.$property" $connector.$property
+        }
+        if ($connector.id -notmatch "^[a-z][a-z0-9-]{0,63}$") {
+            throw "$connectorName.id must start with a lowercase letter and contain only lowercase letters, digits, or hyphens."
+        }
+        if (-not $connectorIds.Add($connector.id)) {
+            throw "$connectorName.id '$($connector.id)' duplicates another enabled connector ID."
+        }
+        Assert-Length "$connectorName.displayName" $connector.displayName 64
+        Assert-Length "$connectorName.description" $connector.description 200
+        $mcpUri = Assert-HttpsUrl "$connectorName.mcpServerUrl" $connector.mcpServerUrl
+        [void]$domains.Add($mcpUri.Host)
 
-    $remoteMcpServer = [ordered]@{
-        mcpServerUrl = $connector.mcpServerUrl
-    }
-    if ($null -ne $connector.authorization) {
-        Assert-AllowedProperties "connectors.$provider.authorization" $connector.authorization @('type', 'referenceId')
-        Assert-String "connectors.$provider.authorization.type" $connector.authorization.type
-        Assert-String "connectors.$provider.authorization.referenceId" $connector.authorization.referenceId
-        if ($connector.authorization.type -ne "OAuthPluginVault" -or
-            [string]::IsNullOrWhiteSpace($connector.authorization.referenceId)) {
-            throw "connectors.$provider.authorization requires type OAuthPluginVault and a referenceId."
+        $remoteMcpServer = [ordered]@{
+            mcpServerUrl = $connector.mcpServerUrl
         }
-        $remoteMcpServer.authorization = [ordered]@{
-            type = "OAuthPluginVault"
-            referenceId = $connector.authorization.referenceId
+        if ($null -ne $connector.authorization) {
+            Assert-AllowedProperties "$connectorName.authorization" $connector.authorization @('type', 'referenceId')
+            Assert-String "$connectorName.authorization.type" $connector.authorization.type
+            Assert-String "$connectorName.authorization.referenceId" $connector.authorization.referenceId
+            if ($connector.authorization.type -ne "OAuthPluginVault" -or
+                [string]::IsNullOrWhiteSpace($connector.authorization.referenceId)) {
+                throw "$connectorName.authorization requires type OAuthPluginVault and a referenceId."
+            }
+            $remoteMcpServer.authorization = [ordered]@{
+                type = "OAuthPluginVault"
+                referenceId = $connector.authorization.referenceId
+            }
         }
-    }
-    $agentConnectors += [ordered]@{
-        id = $connector.id
-        displayName = $connector.displayName
-        description = $connector.description
-        toolSource = [ordered]@{
-            remoteMcpServer = $remoteMcpServer
+        $agentConnectors += [ordered]@{
+            id = $connector.id
+            displayName = $connector.displayName
+            description = $connector.description
+            toolSource = [ordered]@{
+                remoteMcpServer = $remoteMcpServer
+            }
         }
     }
 }
 if ($agentConnectors.Count -eq 0) {
-    throw "Enable at least one Snowflake or Databricks connector."
+    throw "Enable at least one Snowflake, Databricks, or MongoDB connector."
 }
 
 $colorIconPath = Join-Path $configDirectory $config.app.colorIconPath
