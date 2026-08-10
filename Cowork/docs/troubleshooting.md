@@ -26,7 +26,19 @@ additional image validation.
 
 ### Enable at least one connector
 
-Set `connectors.snowflake.enabled` or `connectors.databricks.enabled` to `true`.
+Add at least one enabled entry to `connectors.snowflake`,
+`connectors.databricks`, or `connectors.mongodb`.
+
+### Connector collection is invalid
+
+Each provider value must be a JSON array, including when it has one or zero
+entries. Use `[]` for an unused provider.
+
+### Connector ID is duplicated
+
+Every enabled entry needs a unique `id` across all providers and environments.
+Use environment-specific IDs such as `databricks-development` and
+`databricks-production`.
 
 ### OAuth reference validation failed
 
@@ -58,8 +70,8 @@ for an endpoint intentionally configured without manifest-level OAuth.
 - Check server health and protocol compatibility.
 - Verify the OAuth connection is active and mapped to the correct endpoint.
 - Confirm provider identity permissions and environment targeting.
-- Review Microsoft 365, MCP server, Snowflake, or Databricks audit logs using a
-  shared timestamp or correlation ID.
+- Review Microsoft 365, MCP server, Snowflake, Databricks, or MongoDB audit logs
+  using a shared timestamp or correlation ID.
 
 Do not work around an authorization denial by broadening provider roles without
 review.

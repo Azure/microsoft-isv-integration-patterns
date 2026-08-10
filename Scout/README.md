@@ -12,7 +12,8 @@ plugins to Scout.
 
 The [Cowork custom MCP app package](../Cowork/README.md) is a separate,
 top-level product surface. It builds a tenant-specific Microsoft 365 app
-package that connects Cowork to remote Snowflake and Databricks MCP servers.
+package that connects Cowork to one or more remote Snowflake, Databricks, and
+MongoDB MCP servers.
 
 The repository-level Scout catalog is
 `.github/plugin/marketplace.json`. It references provider-owned public GitHub
@@ -22,7 +23,7 @@ repositories; provider plugin source is not vendored here.
 
 | Need | Pattern |
 | --- | --- |
-| Expose remote Snowflake or Databricks MCP tools in Cowork | Build the sibling [Cowork package](../Cowork/README.md) |
+| Expose remote Snowflake, Databricks, or MongoDB MCP tools in Cowork | Build the sibling [Cowork package](../Cowork/README.md) |
 | Add provider-authored skills to Scout Desktop | Run the provider's `install.ps1` |
 | Support both experiences | Install both; their configuration and lifecycle remain independent |
 

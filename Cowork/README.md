@@ -1,7 +1,9 @@
-# Cowork Snowflake and Databricks custom MCP plugin
+# Cowork data platform custom MCP plugin
 
 This pattern builds a Microsoft 365 app package that exposes approved remote
-Snowflake and Databricks MCP servers to Cowork. The package also includes a
+Snowflake, Databricks, and MongoDB MCP servers to Cowork. Each provider accepts
+multiple connector entries, so one package can expose separate customer
+accounts, workspaces, clusters, or environments. The package also includes a
 runtime skill that guides safe data discovery and analytics.
 
 The repository contains templates only. Tenant endpoints, OAuth vault
@@ -35,9 +37,10 @@ references, publisher metadata, and brand assets remain outside source control.
   `agentConnectors`.
 - A tenant administrator who can upload and approve the app and its
   connections.
-- One or both remote MCP servers:
+- One or more remote MCP servers:
   - an organization-approved Snowflake MCP endpoint;
-  - an organization-approved Databricks MCP endpoint.
+  - an organization-approved Databricks MCP endpoint;
+  - an organization-approved MongoDB MCP endpoint.
 - Existing OAuth Plugin Vault connection reference IDs when the endpoints use
   OAuth. Reference IDs are identifiers, not client secrets or tokens.
 - A 192 x 192 pixel full-color PNG icon and a 32 x 32 pixel transparent outline
@@ -58,7 +61,8 @@ From this directory:
 
 The builder asks only for non-secret package metadata. It generates a new app
 ID by default and saves the answers in the gitignored `plugin.config.json`.
-Enable Snowflake, Databricks, or both.
+Specify how many Snowflake, Databricks, and MongoDB entries the customer needs.
+Zero is valid for an unused provider.
 
 ### File-based configuration
 
@@ -70,10 +74,14 @@ Update `plugin.config.json`:
 
 1. Replace the all-zero `app.id` with a tenant app GUID.
 2. Set publisher URLs, app text, color, and PNG paths.
-3. Enable the required connectors and set their remote MCP HTTPS URLs.
-4. For OAuth endpoints, set `authorization.type` to `OAuthPluginVault` and
+3. Add one array entry per required MCP connection and set its unique `id`,
+   environment-specific display name, and remote MCP HTTPS URL. Connector IDs
+   must be unique across every provider.
+4. Set `enabled` to `false` only when retaining an entry that should not be
+   emitted into the package.
+5. For OAuth endpoints, set `authorization.type` to `OAuthPluginVault` and
    supply the administrator-provided `referenceId`.
-5. Remove `authorization` from a connector only when its endpoint deliberately
+6. Remove `authorization` from a connector only when its endpoint deliberately
    uses no manifest-level authorization.
 
 Do not put client secrets, access tokens, passwords, personal access tokens, or
@@ -132,10 +140,17 @@ they are no longer needed.
 Repository Copilot users can invoke:
 
 - `configure-cowork-data-platform-mcp` to gather inputs, build the package, and
-  guide tenant installation.
+  guide tenant installation. Customers can point Copilot at this repository and
+  invoke that skill for a question-by-question setup workflow.
 - `install-scout-data-platform-plugins` to install provider-maintained
   Snowflake or Databricks plugins in Microsoft Scout Desktop. Scout is a
   separate product surface under `../Scout`.
+
+The setup is guided by a skill, but is not fully automated. The skill can
+collect non-secret values, generate configuration, run validation, build the
+ZIP, and guide verification. A customer or administrator must separately
+provision and approve MCP endpoints, provider identities, OAuth Plugin Vault
+connections, tenant consent, app upload, and pilot assignment.
 
 ## Additional documentation
 

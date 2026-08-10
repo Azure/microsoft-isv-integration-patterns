@@ -1,9 +1,10 @@
 # Primary-source research
 
 Research was performed on August 5, 2026 against public Microsoft, Databricks,
-and Snowflake documentation. The supplied Cowork examples were also inspected
-because Cowork and Microsoft Scout are preview experiences whose package
-extensions are not currently described in public Microsoft Learn content.
+MongoDB, and Snowflake documentation. The supplied Cowork examples were also
+inspected because Cowork and Microsoft Scout are preview experiences whose
+package extensions are not currently described in public Microsoft Learn
+content.
 
 ## Compatibility finding
 
@@ -82,6 +83,15 @@ published project is self-hosted rather than a confirmed Snowflake-managed
 public HTTPS endpoint. Snowflake role-based access controls remain effective
 through the server's configured Snowflake identity.
 
+### MongoDB
+
+MongoDB documents a hosted Atlas MCP server with OAuth and a separate
+self-managed MongoDB MCP server. The customer must choose and approve the
+endpoint appropriate to the deployment; connection strings, database-user
+passwords, and OAuth tokens do not belong in the Cowork package. MongoDB
+authorization remains enforced by the identity used by the selected MCP
+endpoint.
+
 ## Primary sources
 
 - [Microsoft 365 app model for agents](https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/agents-are-apps)
@@ -94,4 +104,5 @@ through the server's configured Snowflake identity.
 - [Dynamic MCP tool discovery](https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/plugin-dynamic-tool-discovery)
 - [Microsoft 365 Agents Toolkit CLI](https://learn.microsoft.com/en-us/microsoftteams/platform/toolkit/microsoft-365-agents-toolkit-cli)
 - [Databricks Labs MCP](https://github.com/databrickslabs/mcp)
+- [MongoDB MCP Server](https://www.mongodb.com/docs/mcp-server/get-started/)
 - [Snowflake Labs MCP](https://github.com/Snowflake-Labs/mcp)

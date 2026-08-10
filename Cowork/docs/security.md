@@ -6,7 +6,8 @@
   data residency, logging policy, and tool inventory.
 - Require HTTPS and use publicly trusted certificates.
 - Configure provider identities with the minimum Snowflake roles, Databricks
-  permissions, catalogs, schemas, warehouses, and workspaces needed.
+  permissions, MongoDB roles, databases, collections, catalogs, schemas,
+  warehouses, and workspaces needed.
 - Prefer separate development, test, and production endpoints and identities.
 - Review tools that execute SQL, mutate objects, manage permissions, start
   jobs, export data, or invoke models.
@@ -24,6 +25,7 @@ history, issue, or chat:
 - private keys;
 - Snowflake key-pair material;
 - Databricks service-principal secrets.
+- MongoDB connection strings, database-user passwords, and private keys.
 
 An `OAuthPluginVault` `referenceId` identifies a tenant-managed connection. It
 is not a substitute for the underlying secret store and should still be
@@ -37,7 +39,8 @@ treated as tenant configuration.
 - Enforce row, column, masking, catalog, and schema policies at the provider.
 - Limit response size and avoid returning sensitive rows when aggregate or
   metadata results satisfy the request.
-- Correlate Microsoft 365, MCP gateway, Snowflake, and Databricks audit logs.
+- Correlate Microsoft 365, MCP gateway, Snowflake, Databricks, and MongoDB audit
+  logs.
 - Alert on denied actions, unusual query volume, bulk export, and repeated
   cross-environment access attempts.
 

@@ -9,14 +9,15 @@ Microsoft 365 tenant
        |
        +-- Custom app manifest
        |    +-- Data Platform Analytics skill
-       |    +-- Snowflake agent connector (optional)
-       |    +-- Databricks agent connector (optional)
+       |    +-- Snowflake agent connector(s) (optional)
+       |    +-- Databricks agent connector(s) (optional)
+       |    +-- MongoDB agent connector(s) (optional)
        |
        +-- OAuth Plugin Vault reference (when configured)
               |
               +-- Organization-approved remote MCP endpoint
                        |
-                       +-- Snowflake or Databricks authorization and tools
+                       +-- Provider authorization and tools
 ```
 
 The app package contains metadata, connector endpoint URLs, OAuth vault
@@ -31,9 +32,10 @@ channel.
 ## Build-time flow
 
 1. The operator creates a tenant-specific `plugin.config.json`.
-2. `build.ps1` validates app metadata, HTTPS URLs, connector settings, and
-   local PNG paths.
-3. The builder converts enabled provider entries into `agentConnectors`.
+2. `build.ps1` validates app metadata, HTTPS URLs, connector settings, globally
+   unique connector IDs, and local PNG paths.
+3. The builder converts every enabled entry in each provider array into an
+   `agentConnectors` entry.
 4. Hosts from publisher and MCP URLs become `validDomains`.
 5. The builder stages the manifest, icons, and skill and creates a root-level
    ZIP package.
@@ -51,7 +53,7 @@ gitignored configuration, not in the reusable template.
    catalog, and data-policy controls.
 6. Tool results return to Cowork for presentation to the user.
 
-The app manifest does not replace Snowflake or Databricks authorization.
+The app manifest does not replace Snowflake, Databricks, or MongoDB authorization.
 Least-privilege provider roles and endpoint-side tool controls remain the
 primary enforcement boundary.
 
