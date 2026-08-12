@@ -1,2 +1,2 @@
-# ai-foundry-snowflake-mcp-agent
-AI Foundry Agent with ISV MCP Server integration
+# Microsoft ISV Integration Pattern
+This Repository hosts the various Microsoft Integration Solutions and Patterns
