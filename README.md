@@ -1,7 +1,4 @@
-# ai-foundry-snowflake-mcp-agent
-AI Foundry Agent with ISV MCP Server integration
-
-## Cowork and Microsoft Scout
+# Cowork and Microsoft Scout
 
 - [Cowork](Cowork/README.md) contains the Snowflake, Databricks, and MongoDB
   custom MCP app-package templates, multi-connector builder, packaged skill,
