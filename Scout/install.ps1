@@ -1,8 +1,8 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)]
-    [ValidateSet("snowflake-cortex-code", "databricks")]
-    [string]$PluginName,
+    [ValidateSet("Snowflake", "Databricks", "MongoDB", "All")]
+    [string]$Platform,
     [string]$MarketplaceSource = "https://github.com/Azure/microsoft-isv-integration-patterns",
     [string]$ScoutHome = (Join-Path $HOME ".scout\copilot"),
     [string]$ScoutSkillsHome = (Join-Path $HOME ".scout\m-skills")
@@ -10,6 +10,17 @@ param(
 
 $ErrorActionPreference = "Stop"
 $marketplaceName = "microsoft-isv-integration-patterns"
+$pluginNames = @{
+    Snowflake = "snowflake-cortex-code"
+    Databricks = "databricks"
+    MongoDB = "mongodb-atlas"
+}
+$selectedPluginNames = if ($Platform -eq "All") {
+    @($pluginNames.Snowflake, $pluginNames.Databricks, $pluginNames.MongoDB)
+}
+else {
+    @($pluginNames[$Platform])
+}
 $copilot = Get-ChildItem `
     "C:\Program Files\Microsoft Scout\resources\app.asar.unpacked\node_modules\@github" `
     -Recurse -Filter copilot.exe -ErrorAction SilentlyContinue |
@@ -80,54 +91,58 @@ try {
     if ($LASTEXITCODE -ne 0) {
         throw "Failed to list installed Scout plugins."
     }
-    $qualifiedPluginName = "$PluginName@$marketplaceName"
-    if ($plugins -match "(?m)^\s*[^A-Za-z0-9]*$([regex]::Escape($qualifiedPluginName))(?:\s|\(|$)") {
-        & $copilot plugin update "$PluginName@$marketplaceName"
-    }
-    else {
-        & $copilot plugin install "$PluginName@$marketplaceName"
-    }
-    if ($LASTEXITCODE -ne 0) {
-        throw "Failed to install or update $PluginName."
-    }
-
-    $pluginSkills = Join-Path $env:COPILOT_HOME "installed-plugins\$marketplaceName\$PluginName\skills"
-    if (-not (Test-Path -LiteralPath $pluginSkills -PathType Container)) {
-        throw "Installed plugin skills were not found at $pluginSkills."
-    }
-
     New-Item -ItemType Directory -Path $ScoutSkillsHome -Force | Out-Null
-    $pluginSkillsRoot = (Resolve-Path -LiteralPath $pluginSkills).Path.TrimEnd("\") + "\"
-    $skillDirectories = @(Get-ChildItem -LiteralPath $pluginSkills -Directory)
-    $currentTargets = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
-    foreach ($skillDirectory in $skillDirectories) {
-        [void]$currentTargets.Add($skillDirectory.FullName)
-    }
-
-    Get-ChildItem -LiteralPath $ScoutSkillsHome -Directory -ErrorAction SilentlyContinue |
-        Where-Object { $_.LinkType } |
-        ForEach-Object {
-            $pluginOwnedTargets = @($_.Target) |
-                Where-Object { $_ -and $_.StartsWith($pluginSkillsRoot, [StringComparison]::OrdinalIgnoreCase) }
-            if ($pluginOwnedTargets -and -not ($pluginOwnedTargets | Where-Object { $currentTargets.Contains($_) })) {
-                Remove-Item -LiteralPath $_.FullName -Force
-            }
+    $registeredSkillCount = 0
+    foreach ($pluginName in $selectedPluginNames) {
+        $qualifiedPluginName = "$pluginName@$marketplaceName"
+        if ($plugins -match "(?m)^\s*[^A-Za-z0-9]*$([regex]::Escape($qualifiedPluginName))(?:\s|\(|$)") {
+            & $copilot plugin update $qualifiedPluginName
+        }
+        else {
+            & $copilot plugin install $qualifiedPluginName
+        }
+        if ($LASTEXITCODE -ne 0) {
+            throw "Failed to install or update $pluginName."
         }
 
-    foreach ($skillDirectory in $skillDirectories) {
-        $link = Join-Path $ScoutSkillsHome $skillDirectory.Name
-        if (Test-Path -LiteralPath $link) {
-            $existing = Get-Item -LiteralPath $link -Force
-            if ($existing.LinkType -and @($existing.Target) -contains $skillDirectory.FullName) {
-                continue
-            }
-            throw "Refusing to replace existing Scout skill: $link"
+        $pluginSkills = Join-Path $env:COPILOT_HOME "installed-plugins\$marketplaceName\$pluginName\skills"
+        if (-not (Test-Path -LiteralPath $pluginSkills -PathType Container)) {
+            throw "Installed plugin skills were not found at $pluginSkills."
         }
-        New-Item -ItemType Junction -Path $link -Target $skillDirectory.FullName | Out-Null
+
+        $pluginSkillsRoot = (Resolve-Path -LiteralPath $pluginSkills).Path.TrimEnd("\") + "\"
+        $skillDirectories = @(Get-ChildItem -LiteralPath $pluginSkills -Directory)
+        $currentTargets = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+        foreach ($skillDirectory in $skillDirectories) {
+            [void]$currentTargets.Add($skillDirectory.FullName)
+        }
+
+        Get-ChildItem -LiteralPath $ScoutSkillsHome -Directory -ErrorAction SilentlyContinue |
+            Where-Object { $_.LinkType } |
+            ForEach-Object {
+                $pluginOwnedTargets = @($_.Target) |
+                    Where-Object { $_ -and $_.StartsWith($pluginSkillsRoot, [StringComparison]::OrdinalIgnoreCase) }
+                if ($pluginOwnedTargets -and -not ($pluginOwnedTargets | Where-Object { $currentTargets.Contains($_) })) {
+                    Remove-Item -LiteralPath $_.FullName -Force
+                }
+            }
+
+        foreach ($skillDirectory in $skillDirectories) {
+            $link = Join-Path $ScoutSkillsHome $skillDirectory.Name
+            if (Test-Path -LiteralPath $link) {
+                $existing = Get-Item -LiteralPath $link -Force
+                if ($existing.LinkType -and @($existing.Target) -contains $skillDirectory.FullName) {
+                    continue
+                }
+                throw "Refusing to replace existing Scout skill: $link"
+            }
+            New-Item -ItemType Junction -Path $link -Target $skillDirectory.FullName | Out-Null
+        }
+        $registeredSkillCount += $skillDirectories.Count
     }
 
     & $copilot plugin list
-    Write-Host "Registered $($skillDirectories.Count) skills. Restart Microsoft Scout to refresh the Skills UI."
+    Write-Host "Registered $registeredSkillCount skills. Restart Microsoft Scout to refresh the Skills UI."
 }
 finally {
     $env:COPILOT_HOME = $previousHome

@@ -6,5 +6,5 @@ param(
 )
 
 $arguments = @{} + $PSBoundParameters
-$arguments.PluginName = "snowflake-cortex-code"
+$arguments.Platform = "Snowflake"
 & (Join-Path $PSScriptRoot "..\install.ps1") @arguments

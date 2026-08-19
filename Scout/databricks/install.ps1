@@ -6,5 +6,5 @@ param(
 )
 
 $arguments = @{} + $PSBoundParameters
-$arguments.PluginName = "databricks"
+$arguments.Platform = "Databricks"
 & (Join-Path $PSScriptRoot "..\install.ps1") @arguments
