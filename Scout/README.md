@@ -19,6 +19,18 @@ The repository-level Scout catalog is
 `.github/plugin/marketplace.json`. It references provider-owned public GitHub
 repositories; provider plugin source is not vendored here.
 
+## Install
+
+Choose Snowflake, Databricks, MongoDB, or All, then pass that selection to the
+installer:
+
+```powershell
+.\Scout\install.ps1 -Platform Snowflake
+.\Scout\install.ps1 -Platform Databricks
+.\Scout\install.ps1 -Platform MongoDB
+.\Scout\install.ps1 -Platform All
+```
+
 ## Choose a pattern
 
 | Need | Pattern |

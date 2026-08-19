@@ -5,17 +5,21 @@ description: Install or update the official Snowflake, Databricks, and MongoDB C
 
 # Install Scout Data Platform Plugins
 
-Ask which providers to install: Snowflake, Databricks, MongoDB, or any
-combination. Then verify
-Microsoft Scout Desktop is installed and review the provider prerequisites in
-its README.
+Present exactly these four options without requesting free-form input:
 
-Run the matching installer from the repository root:
+1. Snowflake
+2. Databricks
+3. MongoDB
+4. All
+
+After the user selects one option, proceed without asking for more installation
+input. Verify Microsoft Scout Desktop is installed and review the selected
+provider prerequisites in its README.
+
+Run the installer from the repository root with the selected option:
 
 ```powershell
-.\Scout\snowflake\install.ps1
-.\Scout\databricks\install.ps1
-.\Scout\mongodb\install.ps1
+.\Scout\install.ps1 -Platform <Snowflake|Databricks|MongoDB|All>
 ```
 
 The scripts use Scout's bundled Copilot CLI, register or update this
