@@ -37,10 +37,9 @@ Scout's private runtime directory (`~/.scout/copilot`), and installs
 `~/.scout/m-skills` so the upstream skills appear in Scout's Skills UI. Restart
 Scout after it completes.
 
-Scout resolves the manifest's remote source and installs
-`plugins/databricks/copilot` at the reviewed commit pinned in
-`marketplace.json`. The provider source is downloaded into Scout's plugin
-cache, not this repository.
+Scout resolves the manifest's remote source and installs the latest commit from
+the `main` branch of the Databricks repository. The provider source is
+downloaded into Scout's plugin cache, not this repository.
 
 ## Update
 
@@ -51,8 +50,8 @@ Run the same command again:
 ```
 
 The script refreshes the marketplace and updates an existing installation to
-the commit pinned by this repository. Upstream changes require a reviewed SHA
-update here before Scout can install them.
+the latest available `main` branch commit. This intentionally follows upstream
+changes without requiring a SHA update in this repository.
 
 ## Uninstall
 

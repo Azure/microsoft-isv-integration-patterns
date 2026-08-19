@@ -17,9 +17,9 @@ MongoDB MCP servers.
 
 The repository-level Scout catalog is
 `.github/plugin/marketplace.json`. It references provider-owned public GitHub
-repositories; provider plugin source is not vendored here. See the
-[marketplace research](docs/research.md) for why reviewed upstream commits are
-pinned with `sha`.
+repositories; provider plugin source is not vendored here. The marketplace
+tracks each provider's `main` branch so installs and updates use the latest
+upstream content.
 
 ## Install
 

@@ -20,10 +20,8 @@ Primary sources:
 
 ## Repository decision
 
-Keep the Snowflake and Databricks `sha` fields. They enforce the reviewed-commit
-policy documented in the provider READMEs and prevent unreviewed upstream
-changes from entering an installation automatically.
-
-MongoDB currently uses `"ref": "main"` instead, so its installs follow the
-latest commit on that branch. Consider pinning MongoDB to a reviewed SHA if the
-same reproducibility policy should apply to every provider.
+The repository intentionally uses `"ref": "main"` for Snowflake, Databricks,
+and MongoDB. This makes Scout installs and updates follow the latest commit
+published by each partner. The accepted tradeoff is that installs are not
+reproducible and upstream changes can take effect without a marketplace
+manifest change.

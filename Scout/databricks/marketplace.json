@@ -12,7 +12,7 @@
         "source": "github",
         "repo": "databricks/databricks-agent-skills",
         "path": "plugins/databricks/copilot",
-        "sha": "50ccd08dfce2001aebc95c784f0bf89f3f268fdf"
+        "ref": "main"
       },
       "category": "development"
     }
