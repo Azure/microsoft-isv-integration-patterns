@@ -1,0 +1,121 @@
+{
+  "properties": {
+    "connectionParameters": {
+      "token": {
+        "type": "oauthSetting",
+        "oAuthSettings": {
+          "identityProvider": "oauth2generic",
+          "clientId": "",
+          "scopes": [
+            "refresh_token"
+          ],
+          "redirectMode": "GlobalPerConnector",
+          "redirectUrl": "REPLACE_WITH_REDIRECT_URL",
+          "properties": {
+            "IsFirstParty": "False",
+            "IsOnbehalfofLoginSupported": false
+          },
+          "customParameters": {
+            "authorizationUrlTemplate": {
+              "value": "https://{accountIdentifier}.snowflakecomputing.com/oauth/authorize"
+            },
+            "tokenUrlTemplate": {
+              "value": "https://{accountIdentifier}.snowflakecomputing.com/oauth/token-request"
+            },
+            "refreshUrlTemplate": {
+              "value": "https://{accountIdentifier}.snowflakecomputing.com/oauth/token-request"
+            }
+          }
+        },
+        "uiDefinition": {
+          "displayName": "Snowflake OAuth Connection",
+          "description": "Sign in to Snowflake with the role authorized for the managed MCP server.",
+          "tooltip": "Sign in to the configured Snowflake account.",
+          "constraints": {
+            "required": "true",
+            "hidden": "false"
+          }
+        }
+      },
+      "token:accountIdentifier": {
+        "type": "string",
+        "uiDefinition": {
+          "displayName": "Snowflake account identifier",
+          "description": "Organization-account identifier for the Snowflake account.",
+          "tooltip": "For example, myorg-myaccount. Do not include https:// or a path.",
+          "constraints": {
+            "required": "true",
+            "hidden": "false",
+            "clearText": true
+          }
+        }
+      },
+      "database": {
+        "type": "string",
+        "uiDefinition": {
+          "displayName": "Database",
+          "description": "Database containing the Snowflake-managed MCP server.",
+          "tooltip": "Enter the unquoted Snowflake database identifier.",
+          "constraints": {
+            "required": "true",
+            "hidden": "false",
+            "clearText": true
+          }
+        }
+      },
+      "schema": {
+        "type": "string",
+        "uiDefinition": {
+          "displayName": "Schema",
+          "description": "Schema containing the Snowflake-managed MCP server.",
+          "tooltip": "Enter the unquoted Snowflake schema identifier.",
+          "constraints": {
+            "required": "true",
+            "hidden": "false",
+            "clearText": true
+          }
+        }
+      },
+      "mcpServer": {
+        "type": "string",
+        "uiDefinition": {
+          "displayName": "MCP server",
+          "description": "Name of the Snowflake-managed MCP server.",
+          "tooltip": "Enter the unquoted Snowflake MCP server identifier.",
+          "constraints": {
+            "required": "true",
+            "hidden": "false",
+            "clearText": true
+          }
+        }
+      }
+    },
+    "iconBrandColor": "#11567F",
+    "capabilities": [],
+    "publisher": "REPLACE_WITH_AUTHORIZED_PUBLISHER",
+    "stackOwner": "Snowflake",
+    "policyTemplateInstances": [
+      {
+        "templateId": "dynamichosturl",
+        "title": "Set Snowflake account host",
+        "parameters": {
+          "x-ms-apimTemplateParameter.urlTemplate": "https://@connectionParameters('token:accountIdentifier').snowflakecomputing.com",
+          "x-ms-apimTemplate-operationName": [
+            "InvokeMCP"
+          ]
+        }
+      },
+      {
+        "templateId": "routerequesttoendpoint",
+        "title": "Set Snowflake MCP server path",
+        "parameters": {
+          "x-ms-apimTemplateParameter.httpMethod": "@Request.OriginalHTTPMethod",
+          "x-ms-apimTemplateParameter.newPath": "/api/v2/databases/@connectionParameters('database')/schemas/@connectionParameters('schema')/mcp-servers/@connectionParameters('mcpServer')",
+          "x-ms-apimTemplate-operationName": [
+            "InvokeMCP"
+          ]
+        }
+      }
+    ]
+  }
+}

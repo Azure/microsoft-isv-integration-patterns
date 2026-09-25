@@ -1,0 +1,94 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Snowflake MCP",
+    "description": "Connect Copilot Studio agents to governed tools exposed by a Snowflake-managed Model Context Protocol server.",
+    "version": "1.0",
+    "contact": {
+      "name": "Microsoft ISV Integration Patterns",
+      "url": "https://github.com/Azure/microsoft-isv-integration-patterns/issues"
+    }
+  },
+  "host": "account-identifier.snowflakecomputing.com",
+  "basePath": "/",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [],
+  "produces": [],
+  "paths": {
+    "/mcp": {
+      "post": {
+        "summary": "Invoke Snowflake MCP",
+        "description": "Sends JSON-RPC messages to the configured Snowflake-managed MCP server.",
+        "operationId": "InvokeMCP",
+        "x-ms-agentic-protocol": "mcp-streamable-1.0",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful MCP response.",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Invalid MCP request."
+          },
+          "401": {
+            "description": "Authentication failed."
+          },
+          "403": {
+            "description": "The Snowflake role is not authorized."
+          },
+          "429": {
+            "description": "The service rate limit was exceeded."
+          },
+          "500": {
+            "description": "Snowflake could not process the MCP request."
+          }
+        }
+      }
+    }
+  },
+  "definitions": {},
+  "parameters": {},
+  "responses": {},
+  "x-ms-connector-metadata": [
+    {
+      "propertyName": "Website",
+      "propertyValue": "https://www.snowflake.com"
+    },
+    {
+      "propertyName": "Privacy policy",
+      "propertyValue": "https://www.snowflake.com/en/legal/privacy/privacy-policy/"
+    },
+    {
+      "propertyName": "Categories",
+      "propertyValue": "AI"
+    }
+  ],
+  "security": [
+    {
+      "oauth2-auth": [
+        "refresh_token"
+      ]
+    }
+  ],
+  "tags": [],
+  "securityDefinitions": {
+    "oauth2-auth": {
+      "type": "oauth2",
+      "flow": "accessCode",
+      "authorizationUrl": "https://account-identifier.snowflakecomputing.com/oauth/authorize",
+      "tokenUrl": "https://account-identifier.snowflakecomputing.com/oauth/token-request",
+      "scopes": {
+        "refresh_token": "Allow the connector to refresh the Snowflake session."
+      }
+    }
+  }
+}
