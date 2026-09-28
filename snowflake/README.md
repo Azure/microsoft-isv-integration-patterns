@@ -12,12 +12,13 @@ proxy, store, or transform Snowflake data.
 
 - `connector/apiDefinition.swagger.json`: OpenAPI 2.0 MCP connector definition.
 - `connector/apiProperties.json`: OAuth and publisher metadata.
-- `connector/icon.png`: 128 x 128 connector icon.
+- `assets/snowflake.svg`: authoritative Snowflake icon from Azure/MCP.
+- `connector/icon.png`: 128 x 128 rasterized connector icon.
+- `THIRD-PARTY-NOTICES.md`: source and license notice for the icon.
 - `intro.md`: certification and customer-facing setup documentation.
 - `docs/certification-research.md`: sourced certification requirements and
   identified submission risks.
 - `scripts/build_source_package.py`: deterministic source-package builder.
-- `scripts/generate_icon.py`: dependency-free icon generator.
 - `tests/test_connector.py`: structural and certification-readiness checks.
 - `dist/snowflake-copilot-studio-connector-source.zip`: generated source
   package.
@@ -30,6 +31,9 @@ connection. The connector asks for:
 | Connection value | Example |
 |---|---|
 | Snowflake account identifier | `myorg-myaccount` |
+| OAuth client ID | Value returned by `SYSTEM$SHOW_OAUTH_CLIENT_SECRETS` |
+| OAuth client secret | Secret returned by `SYSTEM$SHOW_OAUTH_CLIENT_SECRETS` |
+| OAuth scope | `refresh_token session:role:MCP_ACCESS_ROLE` |
 | Database | `MY_DATABASE` |
 | Schema | `MY_SCHEMA` |
 | MCP server | `MY_MCP_SERVER` |
@@ -123,6 +127,12 @@ See [intro.md](intro.md) and
 - Test allowed and denied users, roles, objects, and operations.
 - Do not log authorization headers or confidential Snowflake results.
 - Review the repository [security guidance](../SECURITY.md).
+
+## Icon attribution
+
+The connector uses the Snowflake icon published in the
+[Azure/MCP community registry](https://github.com/Azure/MCP/blob/main/community/registry/icons/snowflake.svg).
+See [third-party notices](THIRD-PARTY-NOTICES.md) for its MIT license notice.
 
 ## References
 

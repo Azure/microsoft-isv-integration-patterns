@@ -11,6 +11,7 @@ OUTPUT = ROOT / "dist" / "snowflake-copilot-studio-connector-source.zip"
 FILES = (
     ROOT / "README.md",
     ROOT / "intro.md",
+    ROOT / "THIRD-PARTY-NOTICES.md",
     ROOT / "connector" / "apiDefinition.swagger.json",
     ROOT / "connector" / "apiProperties.json",
     ROOT / "connector" / "icon.png",

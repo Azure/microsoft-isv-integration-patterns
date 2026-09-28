@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import struct
 import unittest
 import zipfile
@@ -28,6 +29,8 @@ class ConnectorTests(unittest.TestCase):
             "connector/apiDefinition.swagger.json",
             "connector/apiProperties.json",
             "connector/icon.png",
+            "assets/snowflake.svg",
+            "THIRD-PARTY-NOTICES.md",
         ):
             with self.subTest(path=relative_path):
                 self.assertTrue((ROOT / relative_path).is_file())
@@ -164,6 +167,18 @@ class ConnectorTests(unittest.TestCase):
         self.assertEqual(bit_depth, 8)
         self.assertEqual(color_type, 6)
 
+    def test_icon_uses_azure_mcp_snowflake_asset(self) -> None:
+        svg = (ROOT / "assets" / "snowflake.svg").read_bytes()
+        self.assertEqual(
+            hashlib.sha256(svg).hexdigest(),
+            "498f643229f49be63745252a665e44b70fed42c56a2fed0030b735234582aa03",
+        )
+        self.assertIn(b'viewBox="0 0 146.36 139.16"', svg)
+        self.assertIn(b"#29b5e8", svg)
+        self.assertEqual(
+            self.properties["properties"]["iconBrandColor"].lower(), "#29b5e8"
+        )
+
     def test_intro_covers_submission_topics(self) -> None:
         intro = (ROOT / "intro.md").read_text(encoding="utf-8").lower()
         for topic in (
@@ -187,6 +202,7 @@ class ConnectorTests(unittest.TestCase):
                 {
                     "snowflake/README.md",
                     "snowflake/intro.md",
+                    "snowflake/THIRD-PARTY-NOTICES.md",
                     "snowflake/connector/apiDefinition.swagger.json",
                     "snowflake/connector/apiProperties.json",
                     "snowflake/connector/icon.png",
