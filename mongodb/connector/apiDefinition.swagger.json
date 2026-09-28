@@ -1,0 +1,90 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "MongoDB Atlas MCP",
+    "description": "Connect Copilot Studio agents to tools exposed by the MongoDB Atlas-hosted remote Model Context Protocol server.",
+    "version": "1.0",
+    "contact": {
+      "name": "Microsoft ISV Integration Patterns",
+      "url": "https://github.com/Azure/microsoft-isv-integration-patterns/issues"
+    }
+  },
+  "host": "mcp.mongodb.com",
+  "basePath": "/",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [],
+  "produces": [],
+  "paths": {
+    "/": {
+      "post": {
+        "summary": "Invoke MongoDB Atlas MCP",
+        "description": "Sends JSON-RPC messages to the MongoDB Atlas-hosted remote MCP server.",
+        "operationId": "InvokeMCP",
+        "x-ms-agentic-protocol": "mcp-streamable-1.0",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful MCP response.",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Invalid MCP request."
+          },
+          "401": {
+            "description": "Authentication failed."
+          },
+          "403": {
+            "description": "The MongoDB Atlas user is not authorized."
+          },
+          "429": {
+            "description": "The service rate limit was exceeded."
+          },
+          "500": {
+            "description": "MongoDB Atlas could not process the MCP request."
+          }
+        }
+      }
+    }
+  },
+  "definitions": {},
+  "parameters": {},
+  "responses": {},
+  "x-ms-connector-metadata": [
+    {
+      "propertyName": "Website",
+      "propertyValue": "https://www.mongodb.com/products/platform/atlas-database"
+    },
+    {
+      "propertyName": "Privacy policy",
+      "propertyValue": "https://www.mongodb.com/legal/privacy/privacy-policy"
+    },
+    {
+      "propertyName": "Categories",
+      "propertyValue": "AI;Data"
+    }
+  ],
+  "security": [
+    {
+      "oauth2-auth": []
+    }
+  ],
+  "tags": [],
+  "securityDefinitions": {
+    "oauth2-auth": {
+      "type": "oauth2",
+      "flow": "accessCode",
+      "authorizationUrl": "https://cloud.mongodb.com/oauth/authorize",
+      "tokenUrl": "https://authorize.mongodb.com/tokens",
+      "scopes": {}
+    }
+  }
+}

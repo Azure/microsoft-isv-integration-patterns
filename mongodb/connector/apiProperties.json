@@ -1,0 +1,46 @@
+{
+  "properties": {
+    "connectionParameters": {
+      "token": {
+        "type": "oauthSetting",
+        "oAuthSettings": {
+          "identityProvider": "oauth2",
+          "clientId": "",
+          "clientSecret": "",
+          "scopes": [],
+          "redirectMode": "GlobalPerConnector",
+          "redirectUrl": "REPLACE_WITH_REDIRECT_URL",
+          "properties": {
+            "IsFirstParty": "False",
+            "IsOnbehalfofLoginSupported": false
+          },
+          "customParameters": {
+            "authorizationUrl": {
+              "value": "https://cloud.mongodb.com/oauth/authorize"
+            },
+            "tokenUrl": {
+              "value": "https://authorize.mongodb.com/tokens"
+            },
+            "refreshUrl": {
+              "value": "https://authorize.mongodb.com/tokens"
+            }
+          }
+        },
+        "uiDefinition": {
+          "displayName": "MongoDB Atlas OAuth Connection",
+          "description": "Sign in with the MongoDB Atlas user whose permissions the MCP server should use.",
+          "tooltip": "Sign in to MongoDB Atlas.",
+          "constraints": {
+            "required": "true",
+            "hidden": "false"
+          }
+        }
+      }
+    },
+    "iconBrandColor": "#00684A",
+    "capabilities": [],
+    "publisher": "REPLACE_WITH_AUTHORIZED_PUBLISHER",
+    "stackOwner": "MongoDB",
+    "policyTemplateInstances": []
+  }
+}
