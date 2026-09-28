@@ -67,6 +67,35 @@ Snowflake documents the account-specific paths as `/oauth/authorize` and
 `/oauth/token-request`
 ([Snowflake OAuth endpoints](https://docs.snowflake.com/en/user-guide/oauth-custom#invoke-snowflake-oauth-endpoints)).
 
+### Customer-specific OAuth client
+
+The connector collects each customer's OAuth registration when a connection is
+created. `token:ClientId` is a string, `token:ClientSecret` is a secure string,
+and `token:Scope` is a string. OAuth templates consume these values as
+`{ClientId}`, `{ClientSecret}`, and `{Scope}`. Microsoft's certified Cognite
+Data Fusion connector demonstrates this bring-your-own-client pattern
+([Cognite source](https://github.com/microsoft/PowerPlatformConnectors/blob/dev/certified-connectors/Cognite%20Data%20Fusion/apiProperties.json)).
+
+The authorization template includes `{RedirectUrl}`, `{State}`, and the
+customer's scope. Separate token and refresh bodies use `{Code}` and
+`{RefreshToken}` respectively. Microsoft's certified Talkdesk connector
+demonstrates these platform placeholders and body templates
+([Talkdesk source](https://github.com/microsoft/PowerPlatformConnectors/blob/dev/certified-connectors/Talkdesk/apiProperties.json)).
+
+Snowflake supports `client_secret_post`, so the connector sends the customer
+client ID and secret in the form-encoded token and refresh bodies. Snowflake
+also supports HTTP Basic authentication, but it is not required
+([Snowflake client authentication](https://docs.snowflake.com/en/user-guide/oauth-custom#client-authentication)).
+A typical scope is
+`refresh_token session:role:MCP_ACCESS_ROLE`
+([Snowflake OAuth scope](https://docs.snowflake.com/en/user-guide/oauth-custom#scope)).
+
+The callback is not entered by each customer. `GlobalPerConnector` gives the
+imported or published connector one Power Platform-generated callback, injected
+as `{RedirectUrl}`. Every customer registers that callback in their own
+Snowflake OAuth security integration. The publisher must document the actual
+callback after connector import or publication.
+
 The constituent connector policies and dynamic OAuth syntax are verified.
 Microsoft's public sources do not explicitly confirm certification of an MCP
 connector that combines `x-ms-agentic-protocol` with these policies. The
@@ -80,6 +109,13 @@ production OAuth settings, a client ID and secret supplied securely through
 Partner Center, the Microsoft redirect URI, and credentials and instructions
 that exercise every tool
 ([Microsoft authentication requirements](https://learn.microsoft.com/en-us/microsoft-copilot-studio/mcp-server-certification#authentication-support)).
+Microsoft's certified connector repository also demonstrates customer-entered
+OAuth client registrations, which this connector follows. The public
+certification guidance does not explain how Partner Center's publisher-level
+credential fields apply to this bring-your-own-client model. The publisher
+should expect to supply certification test credentials while confirming that
+production customers use their own `token:ClientId` and
+`token:ClientSecret`.
 
 Snowflake-managed MCP supports confidential custom-client OAuth and External
 OAuth. Snowflake documents a Microsoft callback URL, restricted allowed roles,

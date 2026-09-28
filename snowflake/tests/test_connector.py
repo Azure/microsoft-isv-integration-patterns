@@ -69,10 +69,33 @@ class ConnectorTests(unittest.TestCase):
         self.assertEqual(security["flow"], "accessCode")
         self.assertTrue(security["authorizationUrl"].startswith("https://"))
         self.assertTrue(security["tokenUrl"].startswith("https://"))
-        self.assertEqual(set(security["scopes"]), set(oauth["scopes"]))
+        self.assertIn("refresh_token", security["scopes"])
+        self.assertEqual(oauth["scopes"], ["{Scope}"])
         self.assertEqual(oauth["identityProvider"], "oauth2generic")
-        self.assertEqual(oauth["clientId"], "")
-        self.assertNotIn("clientSecret", json.dumps(self.properties))
+        self.assertEqual(oauth["clientId"], "PLACEHOLDER_CLIENTID")
+        self.assertNotIn("REPLACE_WITH_REDIRECT_URL", json.dumps(self.properties))
+
+    def test_oauth_client_configuration_is_supplied_per_connection(self) -> None:
+        parameters = self.properties["properties"]["connectionParameters"]
+        self.assertEqual(parameters["token:ClientId"]["type"], "string")
+        self.assertEqual(parameters["token:ClientSecret"]["type"], "securestring")
+        self.assertEqual(parameters["token:Scope"]["type"], "string")
+        for name in ("token:ClientId", "token:ClientSecret", "token:Scope"):
+            self.assertEqual(
+                parameters[name]["uiDefinition"]["constraints"]["required"], "true"
+            )
+
+        oauth = parameters["token"]["oAuthSettings"]
+        self.assertEqual(oauth["scopes"], ["{Scope}"])
+        templates = oauth["customParameters"]
+        self.assertIn("{ClientId}", json.dumps(templates))
+        self.assertIn("{ClientSecret}", json.dumps(templates))
+        self.assertIn("{Scope}", json.dumps(templates))
+        self.assertIn("{RedirectUrl}", json.dumps(templates))
+        self.assertIn("{State}", json.dumps(templates))
+        self.assertIn("{Code}", json.dumps(templates))
+        self.assertIn("{RefreshToken}", json.dumps(templates))
+        self.assertEqual(oauth["clientId"], "PLACEHOLDER_CLIENTID")
 
     def test_snowflake_endpoint_is_supplied_per_connection(self) -> None:
         properties = self.properties["properties"]
@@ -128,7 +151,6 @@ class ConnectorTests(unittest.TestCase):
     def test_template_marks_all_publisher_owned_values(self) -> None:
         combined = json.dumps(self.definition) + json.dumps(self.properties)
         for token in (
-            "REPLACE_WITH_REDIRECT_URL",
             "REPLACE_WITH_AUTHORIZED_PUBLISHER",
         ):
             with self.subTest(token=token):

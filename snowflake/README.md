@@ -38,18 +38,19 @@ The account identifier is restricted to the Snowflake domain by composing
 `https://<account-identifier>.snowflakecomputing.com`; users do not provide an
 arbitrary URL. The connector uses Microsoft's `dynamichosturl` policy for the
 account authority and `routerequesttoendpoint` for the database, schema, and MCP
-server path. The same account identifier selects the Snowflake OAuth endpoints.
+server path. The same account identifier selects the Snowflake OAuth endpoints. The
+customer's client ID, client secret, and OAuth scope are substituted into the
+authorization-code and refresh-token requests at connection time.
 
 The checked-in files remain publisher templates. Replace these values before
 import and certification:
 
 | Token | Value |
 |---|---|
-| `REPLACE_WITH_REDIRECT_URL` | Redirect URL generated for the imported connector |
 | `REPLACE_WITH_AUTHORIZED_PUBLISHER` | Publisher legally authorized to submit the integration |
 
-Do not commit OAuth client secrets. Microsoft receives production client
-credentials through Partner Center, not through these public connector files.
+Do not commit OAuth client secrets. Each customer enters their client
+credentials into the secure Power Platform connection form.
 
 ### Snowflake prerequisites
 
@@ -58,9 +59,12 @@ credentials through Partner Center, not through these public connector files.
    MCP server, a dedicated least-privileged role, and `read_only: true`.
 3. Grant the user's default OAuth role only the required `USAGE` privileges on the
    warehouse, database, schema, MCP server, and downstream objects.
-4. Configure a confidential OAuth client with Microsoft's generated redirect
-   URL. Restrict allowed roles and set `OAUTH_USE_SECONDARY_ROLES = NONE`.
-5. Verify the endpoint uses this form:
+4. Configure a confidential custom OAuth integration with the published
+   connector's Power Platform-generated redirect URL. Set
+   `OAUTH_USE_SECONDARY_ROLES = NONE` and restrict `ALLOWED_ROLES_LIST`.
+5. Obtain the customer-specific client ID and secret using
+   `SYSTEM$SHOW_OAUTH_CLIENT_SECRETS`.
+6. Verify the endpoint uses this form:
 
    ```text
    https://<account_url>/api/v2/databases/<database>/schemas/<schema>/mcp-servers/<name>
@@ -80,8 +84,8 @@ The build writes
 `snowflake/dist/snowflake-copilot-studio-connector-source.zip`. The archive is
 deterministic and contains only the public connector source artifacts.
 
-For a live endpoint check after replacing the publisher tokens and obtaining
-an access token:
+For a live endpoint check after replacing the publisher token and obtaining an
+access token:
 
 ```powershell
 $headers = @{
@@ -100,7 +104,8 @@ the final Partner Center submission without publisher-owned resources. The
 authorized publisher must still:
 
 1. Confirm it owns or is authorized by Snowflake to publish the integration.
-2. Supply a production HTTPS endpoint and multitenant OAuth configuration.
+2. Confirm the bring-your-own OAuth client pattern and provide certification
+   test credentials in Partner Center.
 3. Import the connector into a Power Platform solution and run Solution Checker.
 4. Export separate connector and test-flow solutions.
 5. Build the Package Deployer archive and outer ZIP containing `intro.md`.

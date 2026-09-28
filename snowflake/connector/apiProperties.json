@@ -5,12 +5,11 @@
         "type": "oauthSetting",
         "oAuthSettings": {
           "identityProvider": "oauth2generic",
-          "clientId": "",
+          "clientId": "PLACEHOLDER_CLIENTID",
           "scopes": [
-            "refresh_token"
+            "{Scope}"
           ],
           "redirectMode": "GlobalPerConnector",
-          "redirectUrl": "REPLACE_WITH_REDIRECT_URL",
           "properties": {
             "IsFirstParty": "False",
             "IsOnbehalfofLoginSupported": false
@@ -19,11 +18,20 @@
             "authorizationUrlTemplate": {
               "value": "https://{accountIdentifier}.snowflakecomputing.com/oauth/authorize"
             },
+            "authorizationUrlQueryStringTemplate": {
+              "value": "?client_id={ClientId}&response_type=code&redirect_uri={RedirectUrl}&scope={Scope}&state={State}"
+            },
             "tokenUrlTemplate": {
               "value": "https://{accountIdentifier}.snowflakecomputing.com/oauth/token-request"
             },
+            "tokenBodyTemplate": {
+              "value": "grant_type=authorization_code&code={Code}&redirect_uri={RedirectUrl}&client_id={ClientId}&client_secret={ClientSecret}"
+            },
             "refreshUrlTemplate": {
               "value": "https://{accountIdentifier}.snowflakecomputing.com/oauth/token-request"
+            },
+            "refreshBodyTemplate": {
+              "value": "grant_type=refresh_token&refresh_token={RefreshToken}&client_id={ClientId}&client_secret={ClientSecret}"
             }
           }
         },
@@ -43,6 +51,45 @@
           "displayName": "Snowflake account identifier",
           "description": "Organization-account identifier for the Snowflake account.",
           "tooltip": "For example, myorg-myaccount. Do not include https:// or a path.",
+          "constraints": {
+            "required": "true",
+            "hidden": "false",
+            "clearText": true
+          }
+        }
+      },
+      "token:ClientId": {
+        "type": "string",
+        "uiDefinition": {
+          "displayName": "OAuth client ID",
+          "description": "Client ID for the customer's Snowflake OAuth security integration.",
+          "tooltip": "Obtain this with SYSTEM$SHOW_OAUTH_CLIENT_SECRETS.",
+          "constraints": {
+            "required": "true",
+            "hidden": "false",
+            "clearText": true
+          }
+        }
+      },
+      "token:ClientSecret": {
+        "type": "securestring",
+        "uiDefinition": {
+          "displayName": "OAuth client secret",
+          "description": "Client secret for the customer's Snowflake OAuth security integration.",
+          "tooltip": "Obtain this with SYSTEM$SHOW_OAUTH_CLIENT_SECRETS.",
+          "constraints": {
+            "required": "true",
+            "hidden": "false",
+            "clearText": false
+          }
+        }
+      },
+      "token:Scope": {
+        "type": "string",
+        "uiDefinition": {
+          "displayName": "OAuth scope",
+          "description": "Space-delimited scopes for refresh access and the Snowflake MCP role.",
+          "tooltip": "For example: refresh_token session:role:MCP_ACCESS_ROLE",
           "constraints": {
             "required": "true",
             "hidden": "false",

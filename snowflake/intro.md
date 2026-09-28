@@ -30,19 +30,23 @@ purpose, inputs, expected outputs, permissions, and test steps.
 ## Setup and authentication
 
 1. Create and test the Snowflake-managed MCP server.
-2. Configure OAuth for a confidential client.
+2. Configure a confidential custom OAuth integration with the published
+   connector's Power Platform-generated redirect URL.
 3. Restrict the OAuth integration to the connector role and disable secondary
    roles.
 4. Grant `USAGE` only on the required warehouse, database, schema, MCP server,
    and downstream Snowflake objects.
-5. Import the connector definition and create an OAuth connection.
-6. Enter the Snowflake organization-account identifier, database, schema, and
-   managed MCP server name when creating the connection.
-7. Add the connector to a Copilot Studio agent and verify tool discovery.
+5. Obtain the OAuth client ID and secret with
+   `SYSTEM$SHOW_OAUTH_CLIENT_SECRETS`.
+6. Import the connector definition and create an OAuth connection.
+7. Enter the Snowflake organization-account identifier, OAuth client ID,
+   OAuth client secret, scope, database, schema, and managed MCP server name.
+8. Add the connector to a Copilot Studio agent and verify tool discovery.
 
 OAuth tokens are passed directly from the Power Platform connection to the
-Snowflake-managed MCP endpoint. Secrets must be supplied through Partner Center
-and must not be committed with the connector source.
+Snowflake-managed MCP endpoint. Each customer supplies their client secret as a
+secure connection parameter; it must not be committed with the connector
+source.
 
 ## Limitations
 
