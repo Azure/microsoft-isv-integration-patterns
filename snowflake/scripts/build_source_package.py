@@ -15,6 +15,8 @@ FILES = (
     ROOT / "connector" / "apiDefinition.swagger.json",
     ROOT / "connector" / "apiProperties.json",
     ROOT / "connector" / "icon.png",
+    ROOT / "scripts" / "deploy_connector.py",
+    ROOT / "scripts" / "validate_connection.py",
 )
 
 

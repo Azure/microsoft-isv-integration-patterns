@@ -1,6 +1,7 @@
 # Snowflake MCP certification research
 
 Research date: September 25, 2026.
+Implementation validation update: November 12, 2026.
 
 ## Certification path
 
@@ -40,7 +41,7 @@ Power Platform supports per-connection backend routing. Values declared under
 `@connectionParameters('name')`
 ([Microsoft policy expressions](https://learn.microsoft.com/en-us/connectors/custom-connectors/policy-templates/expressions/expressions)).
 
-This connector uses two Microsoft policy templates:
+This connector uses two Microsoft routing policy templates:
 
 - `dynamichosturl` builds the authority from the user's Snowflake
   organization-account identifier. The template appends
@@ -56,6 +57,19 @@ these same two policy types, and certified connectors such as Tribal SITS use
 connection-derived host and path values
 ([Cognitive Services source](https://github.com/microsoft/PowerPlatformConnectors/blob/dev/certified-connectors/CognitiveServicesTextAnalytics/apiProperties.json),
 [Tribal SITS source](https://github.com/microsoft/PowerPlatformConnectors/blob/dev/certified-connectors/Tribal%20-%20SITS/apiProperties.json)).
+
+A third, `setheader`, explicitly sets the MCP request's
+`Accept: application/json, text/event-stream`. The operation declares both JSON
+and SSE response media types and notification acceptance (`202`). Snowflake's
+August 20, 2026 change streams `tools/call` responses; this is SSE inside
+Streamable HTTP, not the deprecated standalone SSE transport
+([Snowflake streaming behavior change](https://docs.snowflake.com/en/release-notes/bcr-bundles/un-bundled/bcr-2405)).
+
+Deploy both JSON artifacts, not just the Swagger. The deployment helper submits
+the definition, properties, and icon together, temporarily removing `stackOwner`
+for local custom-connector updates as Microsoft documents. Source certification
+metadata is preserved
+([Microsoft connector CLI](https://learn.microsoft.com/en-us/connectors/custom-connectors/paconn-cli)).
 
 OAuth URL templates use `{placeholder}` substitution rather than policy
 expressions. A `token:accountIdentifier` connection parameter backs
@@ -118,8 +132,10 @@ production customers use their own `token:ClientId` and
 `token:ClientSecret`.
 
 Snowflake-managed MCP supports confidential custom-client OAuth and External
-OAuth. Snowflake documents a Microsoft callback URL, restricted allowed roles,
-and `OAUTH_USE_SECONDARY_ROLES = NONE` for its custom-client configuration
+OAuth, but this connector implements only native confidential-client Snowflake
+OAuth without PKCE. Register the actual generated connector callback, not an
+assumed shared Microsoft URL. Use restricted allowed roles,
+refresh-token issuance, and `OAUTH_USE_SECONDARY_ROLES = NONE`
 ([Snowflake-managed MCP authentication](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents-mcp#set-up-oauth-authentication)).
 Snowflake custom-client OAuth is account-scoped, so the publisher must confirm
 with Microsoft whether it satisfies the multitenant requirement. External OAuth
@@ -142,9 +158,12 @@ possible. Direct SQL should use a separate MCP server and dedicated role, and
 `SYSTEM_EXECUTE_SQL` should remain `read_only: true`
 ([Snowflake-managed MCP server](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents-mcp)).
 
-The caller role needs `USAGE` on the warehouse, database, schema, and MCP server,
-plus only the downstream object privileges needed by enabled tools. The role
-must not be granted to `PUBLIC`.
+The caller role needs `USAGE` on the warehouse, database, schema, and MCP server.
+The user must have a default warehouse. Downstream permissions depend on tool
+type: `USAGE` on agents/search services/functions/procedures, `SELECT` on
+semantic views and queried tables, and applicable Cortex database roles. The
+explicit role scope controls the primary OAuth role; otherwise the user's
+default role applies. The role must not be granted to `PUBLIC`.
 
 ## Metadata and public artifacts
 
@@ -185,6 +204,14 @@ through a SAS URL valid for at least 15 days
 [ConnectorPackageValidator.ps1](https://github.com/microsoft/PowerPlatformConnectors/blob/dev/scripts/ConnectorPackageValidator.ps1)).
 
 ## Required testing
+
+Offline tests validate declared policy wiring for multiple connections, transport
+metadata, HTTP/JSON/SSE probe behavior, deployment arguments, and source/archive
+consistency. They do not execute Power Platform policies or authenticate to a
+customer account. The included live probe validates a direct Snowflake endpoint;
+final acceptance must still create a connection and invoke tools in Copilot
+Studio, including token refresh. No live acceptance result is implied by a
+passing offline suite.
 
 Before submission, test:
 

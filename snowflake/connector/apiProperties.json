@@ -50,7 +50,7 @@
         "uiDefinition": {
           "displayName": "Snowflake account identifier",
           "description": "Organization-account identifier for the Snowflake account.",
-          "tooltip": "For example, myorg-myaccount. Do not include https:// or a path.",
+          "tooltip": "For example, myorg-myaccount. Use hyphens, not underscores; omit https://, .snowflakecomputing.com, and paths.",
           "constraints": {
             "required": "true",
             "hidden": "false",
@@ -102,7 +102,7 @@
         "uiDefinition": {
           "displayName": "Database",
           "description": "Database containing the Snowflake-managed MCP server.",
-          "tooltip": "Enter the unquoted Snowflake database identifier.",
+          "tooltip": "Use the actual database name, normally uppercase (MY_DATABASE). Do not include quotes, schema, or slashes.",
           "constraints": {
             "required": "true",
             "hidden": "false",
@@ -115,7 +115,7 @@
         "uiDefinition": {
           "displayName": "Schema",
           "description": "Schema containing the Snowflake-managed MCP server.",
-          "tooltip": "Enter the unquoted Snowflake schema identifier.",
+          "tooltip": "Use the actual schema name, normally uppercase (MY_SCHEMA). Do not include quotes, database, or slashes.",
           "constraints": {
             "required": "true",
             "hidden": "false",
@@ -128,7 +128,7 @@
         "uiDefinition": {
           "displayName": "MCP server",
           "description": "Name of the Snowflake-managed MCP server.",
-          "tooltip": "Enter the unquoted Snowflake MCP server identifier.",
+          "tooltip": "Use the actual MCP server name, normally uppercase (MY_MCP_SERVER). Do not include database, schema, or slashes.",
           "constraints": {
             "required": "true",
             "hidden": "false",
@@ -158,6 +158,19 @@
         "parameters": {
           "x-ms-apimTemplateParameter.httpMethod": "@Request.OriginalHTTPMethod",
           "x-ms-apimTemplateParameter.newPath": "/api/v2/databases/@connectionParameters('database')/schemas/@connectionParameters('schema')/mcp-servers/@connectionParameters('mcpServer')",
+          "x-ms-apimTemplate-operationName": [
+            "InvokeMCP"
+          ]
+        }
+      },
+      {
+        "templateId": "setheader",
+        "title": "Accept JSON and streamed MCP responses",
+        "parameters": {
+          "x-ms-apimTemplateParameter.name": "Accept",
+          "x-ms-apimTemplateParameter.value": "application/json, text/event-stream",
+          "x-ms-apimTemplateParameter.existsAction": "override",
+          "x-ms-apimTemplate-policySection": "Request",
           "x-ms-apimTemplate-operationName": [
             "InvokeMCP"
           ]

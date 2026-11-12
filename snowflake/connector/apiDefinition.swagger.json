@@ -3,7 +3,7 @@
   "info": {
     "title": "Snowflake MCP",
     "description": "Connect Copilot Studio agents to governed tools exposed by a Snowflake-managed Model Context Protocol server.",
-    "version": "1.0",
+    "version": "1.1",
     "contact": {
       "name": "Microsoft ISV Integration Patterns",
       "url": "https://github.com/Azure/microsoft-isv-integration-patterns/issues"
@@ -27,14 +27,18 @@
           "application/json"
         ],
         "produces": [
-          "application/json"
+          "application/json",
+          "text/event-stream"
         ],
         "responses": {
           "200": {
-            "description": "Successful MCP response.",
+            "description": "MCP JSON response or request-scoped SSE stream.",
             "schema": {
               "type": "object"
             }
+          },
+          "202": {
+            "description": "MCP notification accepted; no response body."
           },
           "400": {
             "description": "Invalid MCP request."

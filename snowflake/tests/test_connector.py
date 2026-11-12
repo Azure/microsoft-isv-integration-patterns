@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import hashlib
+import re
 import struct
 import unittest
 import zipfile
@@ -57,11 +58,33 @@ class ConnectorTests(unittest.TestCase):
         self.assertEqual(operation["operationId"], "InvokeMCP")
         self.assertEqual(operation["x-ms-agentic-protocol"], "mcp-streamable-1.0")
         self.assertIn("application/json", operation["consumes"])
+        self.assertEqual(
+            set(operation["produces"]), {"application/json", "text/event-stream"}
+        )
         self.assertLessEqual(len(operation["summary"]), 80)
         self.assertIn("200", operation["responses"])
+        self.assertIn("202", operation["responses"])
         self.assertIn("401", operation["responses"])
         self.assertIn("403", operation["responses"])
         self.assertIn("429", operation["responses"])
+
+    def test_mcp_requests_accept_json_and_streamed_responses(self) -> None:
+        policies = self.properties["properties"]["policyTemplateInstances"]
+        accept_policies = [
+            policy
+            for policy in policies
+            if policy["templateId"] == "setheader"
+            and policy["parameters"]["x-ms-apimTemplateParameter.name"] == "Accept"
+        ]
+        self.assertEqual(len(accept_policies), 1)
+        parameters = accept_policies[0]["parameters"]
+        self.assertEqual(
+            parameters["x-ms-apimTemplateParameter.value"],
+            "application/json, text/event-stream",
+        )
+        self.assertEqual(parameters["x-ms-apimTemplateParameter.existsAction"], "override")
+        self.assertEqual(parameters["x-ms-apimTemplate-policySection"], "Request")
+        self.assertEqual(parameters["x-ms-apimTemplate-operationName"], ["InvokeMCP"])
 
     def test_oauth_settings_match_definition(self) -> None:
         security = self.definition["securityDefinitions"]["oauth2-auth"]
@@ -120,6 +143,36 @@ class ConnectorTests(unittest.TestCase):
         self.assertIn("@connectionParameters('mcpServer')", policies)
         self.assertIn("dynamichosturl", policies)
         self.assertIn("routerequesttoendpoint", policies)
+
+        policy_templates = {
+            policy["templateId"]: policy["parameters"]
+            for policy in properties["policyTemplateInstances"]
+        }
+        host = policy_templates["dynamichosturl"]["x-ms-apimTemplateParameter.urlTemplate"]
+        path = policy_templates["routerequesttoendpoint"][
+            "x-ms-apimTemplateParameter.newPath"
+        ]
+        for account, database, schema, server in (
+            ("myorg-myaccount", "MY_DATABASE", "MY_SCHEMA", "MY_MCP_SERVER"),
+            ("otherorg-otheraccount", "OTHER_DB", "OTHER_SCHEMA", "OTHER_SERVER"),
+        ):
+            with self.subTest(account=account):
+                values = {
+                    "token:accountIdentifier": account,
+                    "database": database,
+                    "schema": schema,
+                    "mcpServer": server,
+                }
+                endpoint = re.sub(
+                    r"@connectionParameters\('([^']+)'\)",
+                    lambda match: values[match[1]],
+                    host + path,
+                )
+                self.assertEqual(
+                    endpoint,
+                    f"https://{account}.snowflakecomputing.com/api/v2/databases/"
+                    f"{database}/schemas/{schema}/mcp-servers/{server}",
+                )
 
         oauth = parameters["token"]["oAuthSettings"]
         oauth_templates = json.dumps(oauth["customParameters"])
@@ -206,9 +259,17 @@ class ConnectorTests(unittest.TestCase):
                     "snowflake/connector/apiDefinition.swagger.json",
                     "snowflake/connector/apiProperties.json",
                     "snowflake/connector/icon.png",
+                    "snowflake/scripts/deploy_connector.py",
+                    "snowflake/scripts/validate_connection.py",
                 },
             )
             self.assertIsNone(archive.testzip())
+            for name in archive.namelist():
+                self.assertEqual(
+                    archive.read(name),
+                    (ROOT.parent / name).read_bytes(),
+                    f"Stale packaged file: {name}; rebuild the source package",
+                )
 
 
 if __name__ == "__main__":
